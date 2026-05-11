@@ -1,0 +1,4 @@
+docs.json
+  f2191f5f-6b87-42f3-8119-51c640302813:2026-05-11T07:42:50.808Z 22-24
+---
+{"schema_version": "authorship/3.0.0", "base_commit_sha": "HEAD~1", "prompts": {"f2191f5f-6b87-42f3-8119-51c640302813:2026-05-11T07:42:50.808Z": {"agent_id": {"tool": "claude_code", "model": ""}, "human_author": "vaibhav.chopra@razorpay.com", "accepted_lines": 3, "overriden_lines": 0}}}
