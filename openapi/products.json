@@ -1,8 +1,13 @@
 {
   "openapi": "3.1.0",
+  "x-mint": {
+    "mcp": {
+      "enabled": true
+    }
+  },
   "info": {
     "title": "Razorpay Products API",
-    "description": "API specification for Razorpay Payment Links and Subscriptions products.",
+    "description": "API specification for Razorpay Payment Links, Subscriptions, and QR Codes products.",
     "version": "1.0.0",
     "contact": {
       "name": "Razorpay Support",
@@ -575,6 +580,243 @@
                 "description": "The field that caused the error, if applicable.",
                 "example": "amount",
                 "nullable": true
+              }
+            }
+          }
+        }
+      },
+      "QrCode": {
+        "type": "object",
+        "description": "A Razorpay QR Code object for UPI payments.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier of the QR code.",
+            "example": "qr_EtjRHL7viz7RCz"
+          },
+          "entity": {
+            "type": "string",
+            "description": "Entity type. Always `qr_code`.",
+            "example": "qr_code"
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp at which the QR code was created.",
+            "example": 1623914648
+          },
+          "name": {
+            "type": "string",
+            "description": "Name or label for the QR code.",
+            "example": "Store Front Display"
+          },
+          "usage": {
+            "type": "string",
+            "description": "Whether the QR code can be used for single or multiple payments.",
+            "enum": ["single_use", "multiple_use"],
+            "example": "single_use"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of QR code. `upi_qr` for UPI payments.",
+            "enum": ["upi_qr"],
+            "example": "upi_qr"
+          },
+          "image_url": {
+            "type": "string",
+            "description": "URL of the QR code image. Can be embedded or downloaded.",
+            "example": "https://rzp.io/i/w2CEwYmkAu"
+          },
+          "payment_amount": {
+            "type": "integer",
+            "description": "Fixed payment amount in smallest currency unit (paise). Null for open amount QR codes.",
+            "example": 100,
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Current status of the QR code.",
+            "enum": ["active", "closed"],
+            "example": "active"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the QR code.",
+            "example": "For Store 1"
+          },
+          "fixed_amount": {
+            "type": "boolean",
+            "description": "Whether the QR code has a fixed payment amount.",
+            "example": true
+          },
+          "payments_amount_received": {
+            "type": "integer",
+            "description": "Total amount received through this QR code in smallest currency unit.",
+            "example": 0
+          },
+          "payments_count_received": {
+            "type": "integer",
+            "description": "Total number of payments received through this QR code.",
+            "example": 0
+          },
+          "notes": {
+            "type": "object",
+            "description": "Key-value pairs for storing additional information.",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {}
+          },
+          "customer_id": {
+            "type": "string",
+            "description": "Unique identifier of the customer associated with this QR code.",
+            "example": "cust_EtjRHOF6vrzpfy",
+            "nullable": true
+          },
+          "close_by": {
+            "type": "integer",
+            "description": "Unix timestamp after which the QR code will be automatically closed.",
+            "example": 1681615838,
+            "nullable": true
+          },
+          "closed_at": {
+            "type": "integer",
+            "description": "Unix timestamp at which the QR code was closed.",
+            "example": null,
+            "nullable": true
+          },
+          "close_reason": {
+            "type": "string",
+            "description": "Reason for closing the QR code.",
+            "example": null,
+            "nullable": true
+          }
+        }
+      },
+      "CreateQrCodeRequest": {
+        "type": "object",
+        "required": ["type", "usage"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type of QR code. Use `upi_qr` for UPI payments.",
+            "enum": ["upi_qr"],
+            "example": "upi_qr"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name or label for the QR code.",
+            "example": "Store Front Display"
+          },
+          "usage": {
+            "type": "string",
+            "description": "Whether the QR code can be used once or multiple times.",
+            "enum": ["single_use", "multiple_use"],
+            "example": "single_use"
+          },
+          "fixed_amount": {
+            "type": "boolean",
+            "description": "Set to true to create a QR code with a fixed payment amount.",
+            "example": true
+          },
+          "payment_amount": {
+            "type": "integer",
+            "description": "Fixed payment amount in smallest currency unit (paise). Required if `fixed_amount` is true.",
+            "example": 100
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the QR code.",
+            "example": "For Store 1"
+          },
+          "customer_id": {
+            "type": "string",
+            "description": "Unique identifier of the customer to associate with this QR code.",
+            "example": "cust_EtjRHOF6vrzpfy"
+          },
+          "close_by": {
+            "type": "integer",
+            "description": "Unix timestamp after which the QR code will be automatically closed.",
+            "example": 1681615838
+          },
+          "notes": {
+            "type": "object",
+            "description": "Key-value pairs for storing additional information. Maximum 15 pairs.",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "purpose": "Test"
+            }
+          }
+        }
+      },
+      "ListQrCodesResponse": {
+        "type": "object",
+        "description": "Paginated list of QR codes.",
+        "properties": {
+          "entity": {
+            "type": "string",
+            "description": "Entity type. Always `collection`.",
+            "example": "collection"
+          },
+          "count": {
+            "type": "integer",
+            "description": "Number of QR codes returned in this response.",
+            "example": 1
+          },
+          "items": {
+            "type": "array",
+            "description": "List of QR code objects.",
+            "items": {
+              "$ref": "#/components/schemas/QrCode"
+            }
+          }
+        }
+      },
+      "QrCodePaymentsResponse": {
+        "type": "object",
+        "description": "List of payments received for a QR code.",
+        "properties": {
+          "entity": {
+            "type": "string",
+            "description": "Entity type. Always `collection`.",
+            "example": "collection"
+          },
+          "count": {
+            "type": "integer",
+            "description": "Number of payments returned.",
+            "example": 1
+          },
+          "items": {
+            "type": "array",
+            "description": "List of payment objects.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "example": "pay_EtjRHrOCp0Uzxc"
+                },
+                "entity": {
+                  "type": "string",
+                  "example": "payment"
+                },
+                "amount": {
+                  "type": "integer",
+                  "example": 100
+                },
+                "currency": {
+                  "type": "string",
+                  "example": "INR"
+                },
+                "status": {
+                  "type": "string",
+                  "example": "captured"
+                },
+                "method": {
+                  "type": "string",
+                  "example": "upi"
+                }
               }
             }
           }
@@ -1529,6 +1771,307 @@
           }
         }
       }
+    },
+    "/payments/qr_codes": {
+      "post": {
+        "tags": ["QR Codes"],
+        "summary": "Create a QR code",
+        "description": "Creates a new QR code for accepting UPI payments.",
+        "operationId": "createQrCode",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQrCodeRequest"
+              },
+              "example": {
+                "type": "upi_qr",
+                "name": "Store Front Display",
+                "usage": "single_use",
+                "fixed_amount": true,
+                "payment_amount": 100,
+                "description": "For Store 1",
+                "customer_id": "cust_EtjRHOF6vrzpfy",
+                "close_by": 1681615838,
+                "notes": {
+                  "purpose": "Test"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "QR code created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QrCode"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. The request body is missing required fields or contains invalid values.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or missing API credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["QR Codes"],
+        "summary": "List all QR codes",
+        "description": "Returns a paginated list of all QR codes created for your account.",
+        "operationId": "listQrCodes",
+        "parameters": [
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "description": "Number of QR codes to return. Default is 10, maximum is 100.",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "description": "Number of QR codes to skip before returning results. Used for pagination.",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of QR codes retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListQrCodesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or missing API credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payments/qr_codes/{id}": {
+      "get": {
+        "tags": ["QR Codes"],
+        "summary": "Fetch a QR code",
+        "description": "Retrieves the details of a specific QR code by its ID.",
+        "operationId": "getQrCode",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the QR code.",
+            "schema": {
+              "type": "string",
+              "example": "qr_EtjRHL7viz7RCz"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "QR code details retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QrCode"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or missing API credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "QR code not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payments/qr_codes/{id}/close": {
+      "post": {
+        "tags": ["QR Codes"],
+        "summary": "Close a QR code",
+        "description": "Closes an active QR code. Once closed, the QR code can no longer accept payments.",
+        "operationId": "closeQrCode",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the QR code to close.",
+            "schema": {
+              "type": "string",
+              "example": "qr_EtjRHL7viz7RCz"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "QR code closed successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QrCode"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. The QR code may already be closed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or missing API credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "QR code not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payments/qr_codes/{id}/payments": {
+      "get": {
+        "tags": ["QR Codes"],
+        "summary": "Fetch payments for a QR code",
+        "description": "Returns a list of all payments received through a specific QR code.",
+        "operationId": "getQrCodePayments",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the QR code.",
+            "schema": {
+              "type": "string",
+              "example": "qr_EtjRHL7viz7RCz"
+            }
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "description": "Number of payments to return. Default is 10, maximum is 100.",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "description": "Number of payments to skip. Used for pagination.",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of payments retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QrCodePaymentsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or missing API credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "QR code not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "tags": [
@@ -1543,6 +2086,10 @@
     {
       "name": "Subscriptions",
       "description": "Create and manage recurring subscriptions for customers based on defined plans."
+    },
+    {
+      "name": "QR Codes",
+      "description": "Create and manage QR codes for accepting UPI payments in-store or online."
     }
   ]
 }

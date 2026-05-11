@@ -1,5 +1,10 @@
 {
   "openapi": "3.1.0",
+  "x-mint": {
+    "mcp": {
+      "enabled": true
+    }
+  },
   "info": {
     "title": "Razorpay Core Resources API",
     "description": "The Razorpay Core Resources API provides endpoints for managing Orders, Payments, Refunds, and Settlements. Use HTTP Basic Auth with your Key ID as the username and Key Secret as the password.",
