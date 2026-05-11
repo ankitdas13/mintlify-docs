@@ -1,0 +1,51 @@
+---
+title: "API Reference Guide"
+description: "Razorpay APIs are completely RESTful, and all our responses are returned in JSON."
+---
+
+<Info>
+
+**Integrations**
+
+- Looking to integrate your website, ecommerce store or mobile app with Razorpay Payment Gateway? Find the [right integration method](/payments/payment-gateway#integration-types).
+- Accept payments [**without** a website or app](/payments#accept-payments) using other Razorpay products, such as Payment Links, Payment Pages, Subscription Links, Invoices and Smart Collect.
+- For S2S integration, contact the [Support team](https://razorpay.com/support/#request) with your requirements.
+
+  
+
+   Our APIs are present on the Razorpay [Postman Public Workspace](https://www.postman.com/razorpaydev/workspace/razorpay-public-workspace/collection/12492020-952c7295-118c-400f-8f2c-5266ef6f689a). Watch the video to know how to fork APIs and save them to your private workspace for testing.
+   
+
+  
+   Test Razorpay APIs using Postman. Watch the video to know how to get started. 
+   
+   All Razorpay APIs are authenticated using Basic Authentication. You must [generate test API keys](/api/authentication) on the Dashboard before trying the APIs.
+   
+
+</Info>
+## API Gateway URL
+
+For most of the Razorpay APIs, the Gateway URL is `https://api.razorpay.com/v1`. You need to include this before each API endpoint to make API calls. However, certain APIs are on V2. Hence, the gateway URL may differ for certain APIs.
+
+    
+### Example
+
+            
+
+            - Use the URL `https://api.razorpay.com/v1/payments` to access payment resources.
+
+            - Use the URL `https://api.razorpay.com/v2/accounts` to access Route (Linked Account)-related resources.
+
+            
+
+            
+        
+
+### Related Information
+
+- [Understand Razorpay APIs](/api/understand)
+- [API Authentication](/api/authentication)
+- [Sandbox Setup](/api/sandbox-setup)
+- [Errors](/errors)
+- [API Best Practices](/api/best-practices)
+- [API Glossary](/api/glossary)

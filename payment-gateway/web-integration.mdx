@@ -1,0 +1,124 @@
+---
+title: 'Integrate Razorpay Standard Checkout on your website'
+description: 'Integrate Razorpay Standard Checkout on your website using JavaScript to accept payments through cards, wallets, and 100+ other payment modes.'
+---
+
+Standard Checkout for web lets you embed a Razorpay-hosted payment modal on any website using a JavaScript snippet. You create an order on your server, display the checkout to the customer, then verify the payment signature server-side to confirm the transaction.
+
+<Warning>
+  Standard Checkout is not supported on Internet Explorer. Use a modern browser such as Chrome, Firefox, Safari, or Edge.
+</Warning>
+
+## Prerequisites
+
+Before you begin:
+
+- A Razorpay account. Sign up at [dashboard.razorpay.com/signup](https://dashboard.razorpay.com/signup).
+- API Keys (Key ID and Key Secret) generated from your Razorpay Dashboard under **Settings → API Keys**.
+- A server-side environment capable of making HTTP requests (Node.js, Python, PHP, etc.).
+
+## Payment flow
+
+The integration follows three steps:
+
+1. Your server creates an order and returns the order ID to the client.
+2. The client opens the Razorpay checkout modal using the order ID.
+3. After payment, your server verifies the signature to confirm authenticity.
+
+## Integration steps
+
+<Steps>
+  <Step title="Create an order (server-side)">
+    Before showing checkout to the customer, create an order on your server using the Razorpay Node.js SDK (or any server-side SDK). The `amount` is in the smallest currency unit — for USD, that means cents; for INR, paise.
+
+    ```javascript server.js
+    const Razorpay = require('razorpay');
+
+    const instance = new Razorpay({
+      key_id: 'rzp_test_YOUR_KEY_ID',
+      key_secret: 'YOUR_KEY_SECRET',
+    });
+
+    const order = await instance.orders.create({
+      amount: 50000, // Amount in paise (multiply by 100)
+      currency: 'USD',
+      receipt: 'receipt_' + Date.now(),
+    });
+    // Returns: { id: 'order_...', entity: 'order', amount: 50000, ... }
+    ```
+
+    Return `order.id` to your frontend. You will pass this into the checkout options.
+  </Step>
+
+  <Step title="Add the Checkout script and open it">
+    Load the Razorpay Checkout script on your page, then configure and open the modal when the customer clicks the payment button. Pass the `order_id` returned from your server.
+
+    ```html checkout.html
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <button id="rzp-button">Pay ₹500</button>
+
+    <script>
+    var options = {
+      "key": "rzp_test_YOUR_KEY_ID",
+      "amount": "50000",
+      "currency": "USD",
+      "name": "Your Business Name",
+      "description": "Order #12345",
+      "order_id": "order_IluGWxBm9U8zJ8", // from server
+      "handler": function (response) {
+        // Send to your server for verification
+        fetch('/verify-payment', {
+          method: 'POST',
+          body: JSON.stringify(response),
+        });
+      },
+      "prefill": {
+        "name": "Customer Name",
+        "email": "customer@example.com",
+        "contact": "9000000000"
+      },
+      "theme": {
+        "color": "#1d4ed8"
+      }
+    };
+
+    document.getElementById('rzp-button').onclick = function(e) {
+      var rzp = new Razorpay(options);
+      rzp.open();
+      e.preventDefault();
+    };
+    </script>
+    ```
+
+    The `handler` function receives `razorpay_payment_id`, `razorpay_order_id`, and `razorpay_signature`. Send all three to your server for verification.
+  </Step>
+
+  <Step title="Verify the payment signature (server-side)">
+    After the customer completes payment, Razorpay returns a signature. Verify it on your server by recomputing the HMAC-SHA256 hash using your Key Secret. **Never skip this step** — it is what proves the payment is authentic.
+
+    ```javascript verify.js
+    const crypto = require('crypto');
+
+    function verifyPayment(orderId, paymentId, signature) {
+      const body = orderId + '|' + paymentId;
+      const expectedSignature = crypto
+        .createHmac('sha256', 'YOUR_KEY_SECRET')
+        .update(body)
+        .digest('hex');
+      return expectedSignature === signature;
+    }
+    ```
+
+    If `verifyPayment` returns `true`, the payment is genuine and you can fulfil the order. If it returns `false`, treat the payment as invalid.
+  </Step>
+</Steps>
+
+## Best practices
+
+<Tip>
+  Set up webhooks as a backup mechanism to capture payments that are authorized after the customer's browser session ends (for example, due to a network drop). Webhooks are delivered server-to-server and do not depend on the customer's connection.
+</Tip>
+
+- **Always verify signatures server-side.** Client-side verification can be tampered with. Signature verification on your server is the only reliable way to confirm a payment.
+- **Never expose your Key Secret in client-side code.** The Key ID is safe to include in frontend JavaScript; the Key Secret must stay on your server only.
+- **Use Test mode during development.** Your Dashboard provides separate test API keys. Switch to Live keys only when you are ready to accept real payments.

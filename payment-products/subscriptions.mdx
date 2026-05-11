@@ -1,0 +1,165 @@
+---
+title: "Subscriptions: Recurring Billing for SaaS and Memberships"
+description: "Automate recurring charges for SaaS plans, memberships, and installments. Manage billing cycles, plan changes, addons, and cancellations via Razorpay."
+---
+
+Razorpay Subscriptions lets you automate recurring charges for your customers. You define a plan with a billing amount and interval, link customers to that plan, and Razorpay handles authentication, scheduling, and retry logic for every charge that follows.
+
+## Key concepts
+
+<CardGroup cols={2}>
+  <Card title="Plan" icon="layer-group">
+    Defines the billing amount, currency, and interval (daily, weekly, monthly, or yearly). You create plans once and reuse them across multiple subscriptions.
+  </Card>
+  <Card title="Subscription" icon="rotate">
+    Links a specific customer to a plan for a set number of billing cycles. Charges occur automatically on each renewal date.
+  </Card>
+  <Card title="Addon" icon="circle-plus">
+    A one-time charge added to a subscription cycle — for example, a setup fee or a usage overage.
+  </Card>
+  <Card title="Supported intervals" icon="calendar-days">
+    `daily`, `weekly`, `monthly`, and `yearly`. Set the `interval` field to bill every N periods (for example, every 3 months).
+  </Card>
+</CardGroup>
+
+## Subscription states
+
+A subscription moves through these states during its lifecycle:
+
+<AccordionGroup>
+  <Accordion title="created">
+    The subscription has been created but the customer has not yet authenticated a payment method.
+  </Accordion>
+  <Accordion title="authenticated">
+    The customer completed authentication (e.g., card mandate). Razorpay will charge on the scheduled start date.
+  </Accordion>
+  <Accordion title="active">
+    The subscription is running. Charges occur automatically on each billing date.
+  </Accordion>
+  <Accordion title="pending">
+    A charge attempt failed. Razorpay is retrying according to the configured retry schedule.
+  </Accordion>
+  <Accordion title="halted">
+    Maximum retry attempts were reached without a successful charge. Customer action is required to resume.
+  </Accordion>
+  <Accordion title="cancelled">
+    The subscription was stopped by you or the customer. No further charges will occur.
+  </Accordion>
+  <Accordion title="completed">
+    All billing cycles defined by `total_count` have been charged successfully.
+  </Accordion>
+  <Accordion title="expired">
+    The subscription passed its end date without completing all cycles.
+  </Accordion>
+</AccordionGroup>
+
+## Step 1: Create a plan
+
+A plan defines what you charge and how often. Create a plan once and attach multiple subscriptions to it.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.razorpay.com/v1/plans \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET \
+  -H "Content-Type: application/json" \
+  -d '{
+    "period": "monthly",
+    "interval": 1,
+    "item": {
+      "name": "Pro Plan",
+      "amount": 4999,
+      "currency": "USD",
+      "description": "Monthly Pro subscription"
+    }
+  }'
+```
+
+</CodeGroup>
+
+<Note>
+  The `amount` is in the smallest currency unit. For USD, `4999` equals $49.99. The `interval` field multiplies the period — set `"period": "monthly"` with `"interval": 3` to bill every quarter.
+</Note>
+
+## Step 2: Create a subscription
+
+Link a customer to your plan by creating a subscription. Pass the `plan_id` returned from the previous step.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.razorpay.com/v1/subscriptions \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET \
+  -H "Content-Type: application/json" \
+  -d '{
+    "plan_id": "plan_00000000000001",
+    "total_count": 12,
+    "quantity": 1,
+    "customer_notify": 1,
+    "start_at": 1735689600,
+    "addons": [],
+    "notes": {
+      "order_ref": "12345"
+    }
+  }'
+```
+
+</CodeGroup>
+
+The response contains a `subscription_id` (for example, `sub_00000000000001`). Pass this to the Razorpay Checkout in the next step so your customer can authenticate.
+
+## Step 3: Authenticate the customer on the frontend
+
+Open Razorpay Checkout with the `subscription_id` instead of an `order_id`. The customer authenticates their payment method (for example, registers a card mandate), and recurring charges begin on the `start_at` date.
+
+<CodeGroup>
+
+```javascript JavaScript
+var options = {
+  "key": "rzp_test_YOUR_KEY_ID",
+  "subscription_id": "sub_00000000000001",
+  "name": "Acme Corp",
+  "description": "Monthly Pro Plan",
+  "handler": function (response) {
+    // Send these three values to your server for signature verification
+    console.log(response.razorpay_payment_id);
+    console.log(response.razorpay_subscription_id);
+    console.log(response.razorpay_signature);
+  }
+};
+var rzp = new Razorpay(options);
+rzp.open();
+```
+
+</CodeGroup>
+
+<Warning>
+  Always verify the `razorpay_signature` on your server after the customer completes authentication. Skipping this step exposes you to fraudulent callbacks.
+</Warning>
+
+## Step 4: Handle webhook events
+
+Subscribe to subscription webhooks in your Dashboard under **Account & Settings → Webhooks** to keep your system in sync with billing events.
+
+| Event | Description |
+|---|---|
+| `subscription.activated` | The subscription moved to `active` status. |
+| `subscription.charged` | A recurring charge succeeded. |
+| `subscription.completed` | All billing cycles finished. |
+| `subscription.cancelled` | The subscription was cancelled. |
+| `subscription.halted` | Maximum payment retries reached; customer action required. |
+
+<Tip>
+  Use `subscription.halted` events to trigger dunning workflows — for example, sending the customer an email with a link to update their payment method.
+</Tip>
+
+## Managing subscriptions
+
+From the Razorpay Dashboard you can:
+
+- **Pause and resume** an active subscription
+- **Cancel** a subscription immediately or at the end of the current billing cycle
+- **Add addons** to a subscription for one-time charges in the next cycle
+- **View charge history** for each subscription
+
+For programmatic control, use the [Subscriptions API](/api-reference/subscriptions) to cancel, pause, resume, or update a subscription without touching the Dashboard.

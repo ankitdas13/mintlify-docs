@@ -1,0 +1,113 @@
+{
+  "projectType": "saas",
+  "projectName": "Razorpay",
+  "projectDescription": "Razorpay is a comprehensive payments platform that enables businesses to accept, process, and disburse payments through payment gateways, payment links, subscriptions, and developer APIs.",
+  "theme": "luma",
+  "primaryColor": "#1d4ed8",
+  "lightColor": "#93c5fd",
+  "darkColor": "#2563eb",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "dashboard-setup"
+            ]
+          },
+          {
+            "group": "Payment Gateway",
+            "pages": [
+              "payment-gateway/overview",
+              "payment-gateway/web-integration",
+              "payment-gateway/android-integration",
+              "payment-gateway/ios-integration",
+              "payment-gateway/ecommerce-plugins"
+            ]
+          },
+          {
+            "group": "Payment Products",
+            "pages": [
+              "payment-products/payment-links",
+              "payment-products/subscriptions"
+            ]
+          },
+          {
+            "group": "Webhooks",
+            "pages": [
+              "webhooks/overview",
+              "webhooks/setup",
+              "webhooks/events"
+            ]
+          },
+          {
+            "group": "Errors & Troubleshooting",
+            "pages": [
+              "errors/overview",
+              "errors/common-errors"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference/introduction",
+              "api-reference/authentication",
+              "api-reference/sandbox"
+            ]
+          },
+          {
+            "group": "Core Resources",
+            "pages": [
+              "api-reference/orders",
+              "api-reference/payments",
+              "api-reference/refunds",
+              "api-reference/settlements"
+            ]
+          },
+          {
+            "group": "Products",
+            "pages": [
+              "api-reference/payment-links",
+              "api-reference/subscriptions"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Payment Gateway with 100+ payment modes for web and mobile apps",
+    "Standard Checkout with customizable UI for websites",
+    "Payment Links — accept payments without a website or app",
+    "Subscriptions for recurring billing and SaaS businesses",
+    "Android and iOS native SDKs",
+    "Ecommerce plugins for WooCommerce, Shopify, and more",
+    "Webhooks for real-time event notifications",
+    "Test Mode and Live Mode with separate API keys",
+    "Automatic retry for failed refunds",
+    "Dashboard for managing payments, refunds, and settlements"
+  ],
+  "publicApiSurface": [
+    "POST /v1/orders — Create an order",
+    "GET /v1/orders/:id — Fetch order by ID",
+    "POST /v1/payments/:id/capture — Capture a payment",
+    "GET /v1/payments/:id — Fetch payment by ID",
+    "POST /v1/refunds — Create a refund",
+    "GET /v1/refunds/:id — Fetch refund by ID",
+    "GET /v1/settlements — List settlements",
+    "POST /v1/payment_links — Create a Payment Link",
+    "GET /v1/payment_links/:id — Fetch Payment Link by ID",
+    "POST /v1/subscriptions — Create a subscription",
+    "GET /v1/subscriptions/:id — Fetch subscription by ID",
+    "Webhook events: order.paid, payment.authorized, payment.failed, refund.created"
+  ]
+}

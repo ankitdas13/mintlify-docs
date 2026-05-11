@@ -1,0 +1,57 @@
+---
+title: 'Razorpay REST API: base URL, auth, and pagination'
+sidebarTitle: 'Introduction'
+description: 'Learn the base URL, authentication method, rate limiting behavior, and pagination parameters for the Razorpay REST API before making your first call.'
+---
+
+The Razorpay API is a RESTful API. All requests return JSON-encoded responses. You interact with the API by sending HTTP requests to the base URL:
+
+```
+https://api.razorpay.com/v1
+```
+
+Most endpoints are on `v1`. Some newer endpoints use `v2` — the exact URL is noted in those endpoint references.
+
+## Authentication
+
+All API requests use HTTP Basic Authentication. Your **Key ID** is the username and your **Key Secret** is the password. See the [Authentication](/api-reference/authentication) page for full details.
+
+## Rate limits
+
+Razorpay enforces rate limits on API requests. When you exceed the limit, the API returns a `429 Too Many Requests` response. Implement exponential backoff in your client to retry these requests gracefully.
+
+## Pagination
+
+Endpoints that return collections support two query parameters:
+
+| Parameter | Description |
+|-----------|-------------|
+| `count` | Number of results to return (max 100) |
+| `skip` | Number of results to skip (for offset pagination) |
+
+## Making your first API call
+
+The examples below show how to fetch your payments list using the Razorpay API.
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET https://api.razorpay.com/v1/payments \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET
+```
+
+```javascript Node.js
+const Razorpay = require('razorpay');
+
+const instance = new Razorpay({
+  key_id: 'rzp_test_YOUR_KEY_ID',
+  key_secret: 'YOUR_KEY_SECRET',
+});
+```
+
+```python Python
+import razorpay
+client = razorpay.Client(auth=("rzp_test_YOUR_KEY_ID", "YOUR_KEY_SECRET"))
+```
+
+</CodeGroup>

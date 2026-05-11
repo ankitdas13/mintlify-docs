@@ -1,0 +1,56 @@
+---
+title: "Link an Offer to a Subscription"
+description: "After creating an Offer and a Subscription Plan, you need to link the Offer to a Subscription."
+---
+
+- [Link an Offer while creating a Subscription](#link-an-offer-when-creating-a-subscription)
+- [Link an Offer to an active Subscription](#link-an-offer-to-an-existing-subscription)
+
+You can also [delete an Offer linked to a Subscription](/payments/subscriptions/offers/delete).
+
+## Link an Offer While Creating a Subscription
+
+Watch this video to see how to link an Offer to a Subscription.
+
+You can link an Offer while creating a Subscription from the [Dashboard](/payments/subscriptions/offers/link#link-an-offer-while-creating-a-subscription-from) or using [APIs](/payments/subscriptions/offers/link#link-an-offer-while-creating-a-subscription-using).
+
+<Warning>
+
+**Watch Out!**
+
+Offers for Subscriptions are only available when using Razorpay Standard Checkout.
+
+</Warning>
+### Link an Offer While Creating a Subscription From Dashboard
+
+You can link an Offer to a Subscription by selecting the required Offer using the **Offer** drop-down list when creating the Subscription.
+
+Know more about [Subscription Links](/payments/subscriptions/create-subscription-links).
+
+### Link an Offer While Creating a Subscription Using APIs
+
+Use the [Link an Offer to a Subscription API](/api/payments/subscriptions#link-an-offer-to-a-subscription).
+
+## Link an Offer to an Existing Subscription
+
+You can link an Offer to a Subscription or update the Offer linked to a Subscription from the [Dashboard](/payments/subscriptions/offers/link#link-an-offer-to-an-existing-subscription-from) or using [API](/payments/subscriptions/offers/link#link-an-offer-to-an-existing-subscription-using).
+
+- This is possible only if the Subscription is in the `active` state and not in any other state.
+- The Offer is applied to the Subscription at the end of the current billing cycle. It is not possible to update an Offer linked to a Subscription immediately.
+
+### Link an Offer to an Existing Subscription From Dashboard
+
+You can link an Offer to an existing active Subscription by selecting the required Offer using the **Offer** drop-down when updating the Subscription.
+
+Know more about [updating a Subscription](/payments/subscriptions/update).
+
+### Link an Offer to an Existing Subscription Using APIs
+
+Use the [Update a Subscription API](/api/payments/subscriptions#update-a-subscription) to link an Offer to an existing active Subscription by passing the `offer_id: ` in the request body.
+
+### Related Information
+
+- [About Offers](/payments/subscriptions/offers)
+- [Create Subscription Offers](/payments/subscriptions/offers/create)
+- [Update an Offer Linked to a Subscription](/payments/subscriptions/offers/update)
+- [Delete an Offer Linked to a Subscription](/payments/subscriptions/offers/delete)

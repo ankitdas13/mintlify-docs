@@ -1,0 +1,133 @@
+---
+title: 'Orders API — create and manage Razorpay orders'
+description: 'Create, fetch, and list orders using the Razorpay Orders API. An order must be created before initiating a payment through Razorpay Checkout.'
+---
+
+Create an order before you initiate a payment. The `order_id` returned by this API is passed to Razorpay Checkout on your frontend to associate the payment with the correct order.
+
+---
+
+## Create an order
+
+`POST /v1/orders`
+
+### Request parameters
+
+<ParamField body="amount" type="integer" required>
+  Amount in the smallest currency unit. For INR, this is paise (₹500 = `50000`). For USD, this is cents ($5.00 = `500`).
+</ParamField>
+
+<ParamField body="currency" type="string" required>
+  ISO 4217 currency code. For example, `INR` or `USD`.
+</ParamField>
+
+<ParamField body="receipt" type="string">
+  Your internal reference ID for this order. Maximum 40 characters.
+</ParamField>
+
+<ParamField body="notes" type="object">
+  Key-value pairs for custom metadata. Maximum 15 keys, each value up to 256 characters.
+</ParamField>
+
+<ParamField body="partial_payment" type="boolean">
+  Set to `true` to allow the customer to pay in multiple partial payments.
+</ParamField>
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.razorpay.com/v1/orders \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 50000,
+    "currency": "USD",
+    "receipt": "receipt_001",
+    "notes": {
+      "order_ref": "12345"
+    }
+  }'
+```
+
+</CodeGroup>
+
+### Response
+
+```json
+{
+  "id": "order_IluGWxBm9U8zJ8",
+  "entity": "order",
+  "amount": 50000,
+  "amount_paid": 0,
+  "amount_due": 50000,
+  "currency": "USD",
+  "receipt": "receipt_001",
+  "status": "created",
+  "attempts": 0,
+  "notes": { "order_ref": "12345" },
+  "created_at": 1591097057
+}
+```
+
+<ResponseField name="id" type="string">
+  Unique identifier for the order. Pass this to Razorpay Checkout.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Order status. One of `created`, `attempted`, or `paid`.
+</ResponseField>
+
+<ResponseField name="amount_paid" type="integer">
+  Amount already paid against this order, in the smallest currency unit.
+</ResponseField>
+
+<ResponseField name="amount_due" type="integer">
+  Remaining amount yet to be paid.
+</ResponseField>
+
+<ResponseField name="attempts" type="integer">
+  Number of payment attempts made against this order.
+</ResponseField>
+
+---
+
+## Fetch an order
+
+`GET /v1/orders/:id`
+
+```bash
+curl -X GET https://api.razorpay.com/v1/orders/order_IluGWxBm9U8zJ8 \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET
+```
+
+---
+
+## List orders
+
+`GET /v1/orders`
+
+### Query parameters
+
+<ParamField query="count" type="integer">
+  Number of orders to return. Maximum `100`.
+</ParamField>
+
+<ParamField query="skip" type="integer">
+  Number of orders to skip for pagination.
+</ParamField>
+
+<ParamField query="from" type="integer">
+  Unix timestamp. Returns orders created on or after this time.
+</ParamField>
+
+<ParamField query="to" type="integer">
+  Unix timestamp. Returns orders created on or before this time.
+</ParamField>
+
+<ParamField query="authorized" type="boolean">
+  Filter by orders that have an authorized payment.
+</ParamField>
+
+<ParamField query="receipt" type="string">
+  Filter by your internal receipt ID.
+</ParamField>

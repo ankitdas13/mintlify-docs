@@ -1,0 +1,66 @@
+---
+title: "Getting Started with the Razorpay Payments Platform"
+description: "Learn what Razorpay is, how it works, and which products help you accept, process, and disburse payments securely for your business."
+---
+
+Razorpay is a full-stack payments platform trusted by 8 million+ businesses in India. It lets you accept payments through your website or mobile app, send payment requests via links, manage recurring subscriptions, and disburse funds — all through a single integration and a unified Dashboard.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Generate API keys and accept your first payment in under 30 minutes.
+  </Card>
+  <Card title="Dashboard setup" icon="sliders" href="/dashboard-setup">
+    Create your account, complete KYC, and configure your workspace.
+  </Card>
+  <Card title="Payment Gateway" icon="credit-card" href="/payment-gateway/overview">
+    Integrate Razorpay Checkout for web and mobile with 100+ payment modes.
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference/introduction">
+    Explore REST API endpoints for orders, payments, refunds, and more.
+  </Card>
+</CardGroup>
+
+## What Razorpay does
+
+Razorpay sits between your customers and the banking system, handling the complexity of payment processing so you do not have to. When a customer pays on your platform, Razorpay securely collects the funds, routes them through the appropriate payment network, and settles the amount to your bank account.
+
+You interact with Razorpay through three layers:
+
+- **Dashboard** — a web interface for managing payments, refunds, settlements, API keys, team members, and webhooks.
+- **REST API** — available at `https://api.razorpay.com/v1`, it lets you programmatically create orders, verify payments, issue refunds, and more.
+- **Client-side SDKs** — Razorpay Checkout (web), and mobile SDKs for Android, iOS, React Native, and Flutter embed the payment UI directly into your product.
+
+### Key benefits
+
+**100+ payment modes.** Accept credit and debit cards, UPI, netbanking, wallets, EMI, and Pay Later — without building separate integrations for each.
+
+**No-code and low-code options.** Payment Links let you collect money without writing any code. Ecommerce plugins for WooCommerce, Shopify, and Magento get you live in minutes.
+
+**Webhooks for real-time events.** Subscribe to payment, refund, settlement, and dispute events so your systems stay in sync automatically.
+
+**PCI-compliant.** Razorpay is PCI DSS certified. Card data is handled by Razorpay's infrastructure, reducing your compliance scope.
+
+## Test Mode and Live Mode
+
+Razorpay gives you two separate environments that share the same API surface but operate independently.
+
+| | Test Mode | Live Mode |
+|---|---|---|
+| **Key prefix** | `rzp_test_` | `rzp_live_` |
+| **Real money** | No | Yes |
+| **KYC required** | No | Yes |
+| **Use case** | Development and QA | Production traffic |
+
+<Note>
+  Test Mode transactions do not move real money. You can use Razorpay-provided test card numbers, UPI IDs, and netbanking credentials to simulate the full payment flow without any charges.
+</Note>
+
+<Warning>
+  Never use Test Mode API keys in a production environment, and never expose your Key Secret in client-side code. Your Key Secret authenticates server-to-server requests and must be kept confidential.
+</Warning>
+
+You generate separate API key pairs for each mode. Switch between modes in the Dashboard using the environment toggle in the top navigation bar. When you are ready to go live, replace your `rzp_test_` keys with `rzp_live_` keys and complete KYC verification.
+
+<Tip>
+  Build and test your entire integration in Test Mode before applying for KYC. This way, your integration is production-ready the moment your account is approved.
+</Tip>

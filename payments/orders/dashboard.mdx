@@ -1,0 +1,57 @@
+---
+title: "Orders - Dashboard Actions"
+description: "You can use the Dashboard to perform the following actions:"
+---
+
+- [View Order Details from Dashboard](#view-order-details-from-dashboard)
+- [Subscribe to Webhooks](#subscribe-to-webhook-events)
+- [View reports](#reports)
+## View Order Details From Dashboard
+
+Watch this video to see how to view order details from the Dashboard.
+
+To view order details:
+<Steps>
+<Step title="Step 1">
+Log in to the Dashboard.
+</Step>
+<Step title="Step 2">
+Select **Transactions** from the left menu and click **View All** on the **Orders** tab.
+</Step>
+<Step title="Step 3">
+A list of all the orders is displayed.
+</Step>
+<Step title="Step 4">
+Click an **Order Id** to view the details of the order.
+</Step>
+</Steps>
+
+### View Order Details Using API
+
+- [View all orders using Fetch Orders API](/api/orders/fetch-all).
+- [View specific details of an order using Fetch an Order with ID API](/api/orders/fetch-with-id).
+
+## Subscribe to Webhook Events
+
+Subscribe to Webhook events available for orders to receive notifications.
+
+To subscribe to Webhook events:
+
+1. Log in to the Dashboard.
+2. Navigate to **Accounts & Settings** → Webhooks to subscribe to any of the following events:
+
+The table below lists the webhook events available for orders.
+
+Webhook Event | Description
+---
+`order.paid` | Triggered when an order is successfully paid.
+
+Know more about [Webhooks](/webhooks) and check the [sample payloads](/webhooks/orders).
+
+## Reports
+
+Detailed insights can be gained using reports and real-time data on the Dashboard. These reports can then be used for accounting and reconciliation purposes. Know more about [reports](/payments/dashboard/reports).
+
+### Related Information
+- [About Orders](/payments/orders)
+- [Orders APIs](/payments/orders/apis)

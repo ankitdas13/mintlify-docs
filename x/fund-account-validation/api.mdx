@@ -1,0 +1,64 @@
+---
+title: "Account Validation APIs"
+description: "To make a [payout](/x/payouts) to a Contact, you must:"
+---
+
+1. Create a Contact. 
+1. Add a Fund account to the Contact. 
+1. Validate the Contact's Fund account. 
+1. Make payouts.
+You can validate your Contact's Fund account/s using the following Validation APIs.  
+
+<Warning>
+
+**Watch Out!**
+
+You must [allowlist your IPs](/x/dashboard/allowlist-ip) to use the Account Validation APIs.
+
+</Warning>
+## Account Validation APIs 
+
+Account Validation APIs validate previously created Contact's Fund accounts. You can create a Contact and Fund Account from the [RazorpayX Dashboard](https://x.razorpay.com/auth) or using the APIs.
+
+The table below lists the various endpoints and gives a brief description of each:
+
+API Endpoint | Description
+---
+[Create a Contact](/api/x/account-validation/create-contact) | Creates a Contact. 
+---
+[Create Fund account (Bank account)](/api/x/account-validation/bank-account/create-fund-account) | Creates a [Fund account of the type bank account](/x/fund-accounts#fund-account-types). 
+---
+[Validate a Bank Account](/api/x/account-validation/bank-account) | Validates the Contact's bank account information. 
+---
+[Create Fund account (VPA)](/api/x/account-validation/vpa/create-fund-account) | Creates a [Fund account of the type VPA](/x/fund-accounts#fund-account-types). 
+---
+[Validate a VPA](/api/x/account-validation/vpa) | Validate the Contact's Virtual Payment Address (VPA)/UPI account information.
+---
+[Validate VPA using Reverse Penny Drop](/api/x/account-validation/reverse-penny-drop) | Validate a bank account using Reverse Penny Drop
+---
+[Fetch all Account Validation Transactions](/api/x/account-validation/fetch-all-transactions) | Retrieves all account validation transactions.
+---
+[Fetch an Account Validation Transaction with ID](/api/x/account-validation/fetch-transactions-with-id) | Retrieves a single account validation transaction with ID.
+---
+
+## Composite Account Validation APIs
+
+With Composite Account Validation, you can use a single API to perform all the actions at once, including account validation. This is useful to create new Contacts and Fund accounts immediately. You can create a Contact and Fund Account from the [RazorpayX Dashboard](https://x.razorpay.com/auth) as well.
+
+The table below lists the various endpoints and gives a brief description of each:
+
+API Endpoint | Description
+---
+[Validate a Bank Account](/api/x/composite-account-validation/bank-account) | Create Contact, Fund Account with bank details and Validate the Contact's bank account information in a single API call.
+---
+[Validate a VPA](/api/x/composite-account-validation/vpa) | Create Contact, Fund Account with VPA and Validate the Contact's bank account information in a single API call.
+---
+[Fetch all Account Validation Transactions](/api/x/composite-account-validation/fetch-all-transactions) | Retrieves all account validation transactions.
+---
+[Fetch an Account Validation Transaction with ID](/api/x/composite-account-validation/fetch-transactions-with-id) | Retrieves a single account validation transaction with ID.
+---
+
+### Related Information
+
+- [Fund Account Validation](/x/fund-account-validation)
+- [Subscribe to Webhooks](/x/apis/subscribe)

@@ -1,0 +1,67 @@
+---
+title: 'Authenticate Razorpay API requests with Basic Auth'
+description: 'Authenticate every Razorpay API request using HTTP Basic Auth. Learn how to generate API keys, pass credentials, and keep your Key Secret secure.'
+---
+
+Razorpay uses **HTTP Basic Authentication** for all API requests. Your **Key ID** acts as the username and your **Key Secret** acts as the password. Every request to the API must include these credentials.
+
+## Generating API keys
+
+Generate your keys from the Razorpay Dashboard:
+
+**Dashboard → Account & Settings → API Keys**
+
+Razorpay provides two types of keys:
+
+| Key type | Prefix | Use |
+|----------|--------|-----|
+| Test Mode | `rzp_test_*` | Development and testing — no real money moves |
+| Live Mode | `rzp_live_*` | Production payments |
+
+<Warning>
+Never commit your API keys to source control. Store them as environment variables and load them at runtime.
+</Warning>
+
+## Authenticating requests
+
+Pass your Key ID and Key Secret using the `-u` flag in cURL, or as a Basic Auth header. Most SDKs handle this automatically.
+
+<CodeGroup>
+
+```bash cURL
+# Using curl's -u flag (recommended)
+curl https://api.razorpay.com/v1/payments \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET
+
+# Manually constructing the Authorization header
+# Base64 encode "key_id:key_secret" first
+curl https://api.razorpay.com/v1/payments \
+  -H "Authorization: Basic <base64(key_id:key_secret)>"
+```
+
+```javascript Node.js
+// Node.js SDK — reads credentials from environment variables
+const instance = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
+```
+
+```python Python
+# Python SDK — reads credentials from environment variables
+import razorpay
+import os
+
+client = razorpay.Client(auth=(
+    os.environ['RAZORPAY_KEY_ID'],
+    os.environ['RAZORPAY_KEY_SECRET']
+))
+```
+
+</CodeGroup>
+
+## Security best practices
+
+- Never expose your **Key Secret** in client-side code (browser JavaScript, mobile apps).
+- Use **Test Mode** keys during development so no real transactions occur.
+- Rotate your keys immediately if you suspect they have been compromised — do this from **Dashboard → Account & Settings → API Keys**.

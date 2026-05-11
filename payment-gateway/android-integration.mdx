@@ -1,0 +1,85 @@
+---
+title: 'Integrate Razorpay checkout in your Android app'
+description: 'Integrate Razorpay Standard Checkout into your native Android app using the Kotlin SDK to accept payments with cards, wallets, and more.'
+---
+
+The Razorpay Android SDK embeds a native checkout experience directly into your Android app. You initialize the SDK with an order created on your server, open the checkout, and handle the result through a callback interface.
+
+## Add the dependency
+
+Add the Razorpay Checkout SDK to your module-level `build.gradle` file:
+
+```gradle build.gradle
+dependencies {
+    implementation 'com.razorpay:checkout:1.6.40'
+}
+```
+
+<Note>
+  From version 1.6.22 onwards, the SDK is written in Kotlin. Make sure the Kotlin standard library is included in your project. Most modern Android projects include it by default.
+</Note>
+
+<Tip>
+  From version 1.6.40 onwards, the SDK auto-updates itself. You no longer need to manually bump the version for minor updates.
+</Tip>
+
+## PCI compliance requirements
+
+The Razorpay Android SDK requires **TLS 1.1 or TLS 1.2** for all network communication. Devices running Android 4.0 (API level 14) and below do not support TLS 1.2 by default. If you need to support those devices, enable TLS explicitly using a custom `SSLSocketFactory`.
+
+## Integration steps
+
+<Steps>
+  <Step title="Create an order on your server">
+    Before opening checkout, create an order using the Razorpay API from your backend. Return the `order_id` to your app. See the [web integration guide](/payment-gateway/web-integration) for a server-side example — the order creation API is the same across all platforms.
+  </Step>
+
+  <Step title="Implement the checkout in your Activity">
+    Implement `PaymentResultListener` in your Activity or Fragment, preload the SDK in `onCreate`, and open the checkout when you are ready.
+
+    ```kotlin CheckoutActivity.kt
+    import com.razorpay.Checkout
+    import com.razorpay.PaymentResultListener
+
+    class CheckoutActivity : AppCompatActivity(), PaymentResultListener {
+
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            Checkout.preload(applicationContext)
+        }
+
+        fun startPayment() {
+            val checkout = Checkout()
+            checkout.setKeyID("rzp_test_YOUR_KEY_ID")
+
+            val options = JSONObject()
+            options.put("name", "Your Business")
+            options.put("description", "Order #12345")
+            options.put("order_id", "order_IluGWxBm9U8zJ8")
+            options.put("currency", "USD")
+            options.put("amount", "50000")
+
+            checkout.open(this, options)
+        }
+
+        override fun onPaymentSuccess(razorpayPaymentId: String) {
+            // Payment succeeded — verify the signature on your server
+        }
+
+        override fun onPaymentError(code: Int, response: String?) {
+            // Payment failed or was cancelled
+        }
+    }
+    ```
+
+    Call `Checkout.preload(applicationContext)` in `onCreate` to initialize the SDK in the background. This reduces the time to display checkout when the customer taps the payment button.
+  </Step>
+
+  <Step title="Verify the payment signature on your server">
+    After `onPaymentSuccess` is called, send the `razorpayPaymentId` along with the `order_id` and `razorpay_signature` to your server for verification. Use the same signature verification logic described in the [web integration guide](/payment-gateway/web-integration).
+  </Step>
+</Steps>
+
+<Warning>
+  Always verify the payment signature on your server before fulfilling an order. The `onPaymentSuccess` callback alone does not confirm that the payment is authentic.
+</Warning>

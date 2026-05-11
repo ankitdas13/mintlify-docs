@@ -1,0 +1,81 @@
+---
+title: "Set Refund Speed"
+description: "You can configure the speed at which all the refunds should be processed for your customers."
+---
+
+## Set Default Speed of Refunds
+
+Depending on your business needs, you can select from the following:
+
+- **Normal Refund**
+
+In this mode, the speed attribute is set to `normal`. The customers will receive their refunds within 5-7 business days.
+
+- **Instant Refund**
+
+In this mode, the speed attribute is set to `optimum`. Razorpay attempts to initiate fund transfer using IMPS, NEFT or UPI. The customer will receive the refunds instantly. If unsuccessful, Razorpay processes the refund via the `normal` speed.
+
+The selected speed is set as the **default speed** and all the refunds, thereafter, will be processed at the chosen speed.
+
+To set the default speed for all the refunds:
+
+<Steps>
+<Step title="Step 1">
+Log in to the Dashboard.
+</Step>
+<Step title="Step 2">
+Navigate to **Account & Settings** and click **Capture and refund settings** under the **Payments and refunds** section.
+</Step>
+<Step title="Step 3">
+In the **Default Refund Speed** section, choose between **Normal Refund** and **Instant Refund**.
+</Step>
+</Steps>
+
+    
+    **Handy Tips**
+
+    The chosen value is also applied as the default speed in the [Refund API request](/api/refunds).
+    
+
+## Override Default Refund Speed
+
+You can override the default refund speed while refunding a payment from the **Transactions** → **Payments** tab of the Dashboard.
+
+Watch this video to see how to override the default refund speed while issuing a refund.
+
+The possible ways in which you can switch between Normal and Instant Refunds are listed below:
+
+**Default Speed setting** | **All Refunds** | **Refund Payment option** | **Processed speed of the Refund**
+---
+**Normal Refund** | All the refunds are processed at the `normal` speed. | **Refund Instantly** option is selected. | The refund is processed at the `optimum` speed. If an instant refund is not possible, Razorpay initiates a normal refund.
+---
+**Instant Refund** | All the refunds are processed at an `optimum` speed.
+ If an instant refund is not possible, Razorpay initiates a normal refund. | **Refund Instantly** option is unselected. | The refund is processed at the `normal` speed.
+
+To set the default speed for all the refunds:
+
+<Steps>
+<Step title="Step 1">
+Log in to the Dashboard.
+</Step>
+<Step title="Step 2">
+Navigate to **Account & Settings** and select **Capture and refund settings**.
+</Step>
+<Step title="Step 3">
+In the **Default Refund Speed** section, choose between **Normal Refund** and **Instant Refund**.
+</Step>
+</Steps>
+
+    
+    **Handy Tips**
+
+    The chosen value is also applied as the default speed in the [Refund API request](/api/refunds).
+    
+
+### Related Information
+- [About Refunds](/payments/refunds)
+- [Normal Refunds](/payments/refunds/normal)
+- [Batch Refunds](/payments/refunds/batch)
+- [Issue Refunds](/payments/refunds/issue)
+- [View Refunds](/payments/refunds/view)
+- [Refunds FAQs](/payments/refunds/faqs)

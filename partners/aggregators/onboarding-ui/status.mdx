@@ -1,0 +1,44 @@
+---
+title: "Merchant Onboarding Status"
+description: "You can retrieve a merchant's account onboarding status. Using this information, you can:"
+---
+
+- Nudge your sub-merchants to complete their onboarding and get payments enabled.
+- Know when the merchant account is activated to manage their payments. 
+There are two ways to fetch the status of merchant onboarding:
+
+- [Using API](#using-apis)
+- [Using Webhooks](#using-webhooks)
+
+## Using API
+
+Use the [Fetch account API](/api/partners/account-onboarding/fetch) to get the onboarding status of the sub-merchant. 
+
+## Using Webhooks
+
+[Subscribe to webhook events](/partners/aggregators/onboarding-api/webhooks) to receive real-time notifications about the merchant account activation status. 
+
+    
+    Webhook Event | Payload
+    ---
+    `account.activated` | [Sample Payload](/webhooks/partners/activated#account-activated)
+    ---
+    `account.under_review` | [Sample Payload](/webhooks/partners/under-review#account-under-review)
+    ---
+    `account.needs_clarification` | [Sample Payload](/webhooks/partners/needs-clarification#account-needs-clarification)
+    ---
+    `account.suspended` | [Sample Payload](/webhooks/partners/suspended#account-suspended)
+    ---
+    `account.rejected` | [Sample Payload](/webhooks/partners/rejected#account-rejected)
+    ---
+    `account.activated_kyc_pending` | [Sample Payload](/webhooks/partners/activated-kyc-pending#account-activated-kyc-pending)
+    ---
+    `account.funds_hold` | [Sample Payload](/webhooks/partners/funds-onhold#account-funds-on-hold)
+    ---
+    `account.funds_unhold` | [Sample Payload](/webhooks/partners/funds-unhold#account-funds-unhold)
+    ---
+    `account.activated_kyc_pending` | [Sample Payload](/webhooks/partners/activated-kyc-pending#account-activated-kyc-pending)
+    ---
+    `account.instantly_activated` | [Sample Payload](/webhooks/partners/instantly-activated#account-instantly-activated)
+    ---
+    `account.payments_enabled` | [Sample Payload](/webhooks/partners/payment-enabled#account-payment-enabled)

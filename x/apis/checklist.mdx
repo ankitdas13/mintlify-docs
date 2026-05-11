@@ -1,0 +1,44 @@
+---
+title: "API Integration Checklist"
+description: "The following table lists the recommended practices for a successful API Integration with RazorpayX."
+---
+
+Checklist | Description
+---
+Ensure you have a Live Account | You can access both, Live and Test mode. [Generate Key ID and Secret](/api/x#generate-api-key) in Live mode for real-time transactions.
+---
+Select the Type of Account | -  [Current Account](/x/account-types/current-account) :  A direct Integration with the bank is more economical. The beneficiary gets the registered company name in the narration field.
+-  [RazorpayX Lite](/x/account-types/razorpayx-lite) : A backup channel in case of primary channel failure.
+
+---
+Select the Type of API integration | While using standalone API's, the fund account can be re-used, which reduces the response time, which in turn, reduces the load on the data base.
+---
+Choose a Payout Method | Bank accounts and UPI are available by default. [Cards](/api/x/payouts-cards) require PCI-DSS compliance.
+---
+Make a [Penny Drop](/x/fund-account-validation) | Improved efficiency as fund accounts are validated before actual payout.
+---
+Check for Additional Integration | You have the provision to include multiple solutions other than payouts to enhance end-user experience.
+---
+Use [Source Account Validation](/x/account-types/source-account-validation) | Fund inflow from only trusted sources.
+---
+Use [Payouts Pro](/x/payouts/intelligent-payouts) | Increase success rate of payouts when the beneficiary bank is down.
+---
+Check [Idempotency](/api/x/payout-idempotency/make-request) Header ([Handling 5XX error](/errors/x#handling-5xx-errors)) | Eliminate duplicate payouts due to human or network error.
+---
+Check if Feature Enablement is required | [Contact support](/x/support) and enable the feature in case the required is not available on your dashboard.
+---
+[Set up Webhooks](/webhooks/setup-edit-payouts) | Receive realtime status update. There is less load on the Dashboard due to reduced fetch calls.
+---
+[Fetch Transactions API](/api/x/transactions/fetch-all) | Combined with webhook reconciliation, the fetch API's provide an optimal/reliable reconciliation process.
+---
+[Allowlist IPs](/x/dashboard/allowlist-ip) | Non-allowlisted IP API calls are rejected, hence, improves security.
+---
+Get [Custom Reports](/x/reports) | Efficiently collate data that is required to ease reconciliation.
+---
+Enable [Downtime webhook events](/webhooks#payout-downtime-started) | Provides proactive alerts in case of scheduled downtimes.
+---
+[Contact support team](/x/support) or your RazorpayX POC for Custom Integration | Custom builds are available for specific use cases.
+
+### Related Information
+
+- [Payouts Best Practices](/x/payouts/best-practices)

@@ -1,0 +1,81 @@
+---
+title: "About Turbo UPI"
+description: "Use Razorpay Turbo UPI to make UPI payments faster. Following are the sample screens while making payments using Turbo UPI."
+---
+
+## Advantages
+
+    
+        - Simplified payment process with just two steps.
+        - Higher success rate.
+        - One stop for refunds and disputes.
+    
+    
+        - Higher success rates with a smoother payment experience.
+        - Complete in-app flow with no redirections gives better control over the user journey.
+        - Reduce timeout issues significantly since customers never leave your app.
+    
+
+<Warning>
+
+**Watch Out!**
+
+Due to the sensitive nature of the added libraries, we must ensure that the app is running in a proper environment. Therefore, after integration, the app will not run on Android emulators.
+
+</Warning>
+## Prerequisites
+
+1. Contact our [integrations team](mailto:integrations@razorpay.com) to get access to the sample app repository.
+2. Get your mobile number and app whitelisted.
+
+## Customer Onboarding Flow
+
+Your customers can link their VPAs to your app with these steps:
+1. The customer navigates to your app's checkout screen and taps **Add bank account**.
+    
+
+    
+<Info>
+**Handy Tips**
+</Info>
+
+The customer needs to give permission so that we can validate the phone number with the bank.
+
+    
+<Warning>
+
+**Watch Out!**
+
+As a compliance requirement, you need to get approval from Google for **READ_SMS** permission.
+
+2. The customer's bank details are fetched and linked to the VPA.
+
+    
+
+    - The customer selects a bank from the list. 
+        
+
+3. The customer can complete the payment using the new VPA.
+
+<Info>
+**Handy Tips**
+</Info>
+
+If no UPI PIN is set, the customers are prompted to provide their card details, enter an OTP and complete the set-up.
+
+</Warning>
+## Transaction Flow 
+
+After the customer is onboarded, on the checkout page of your app:
+
+- The customer selects the linked UPI Account.
+ 
+- Enters the UPI PIN to complete the payment.
+ 
+
+### Related Information
+
+- [Turbo UPI Headless](/payments/payment-gateway/ios-integration/custom/payment-methods/turbo-upi/integrate-noui)
+- [Turbo UPI with UI](/payments/payment-gateway/ios-integration/custom/payment-methods/turbo-upi/integrate-ui)
+- [Turbo UPI Headless Mock](/payments/payment-gateway/ios-integration/custom/payment-methods/turbo-upi/integration-noui-mock)
+- [Turbo UPI with UI Mock](/payments/payment-gateway/ios-integration/custom/payment-methods/turbo-upi/integration-ui-mock)

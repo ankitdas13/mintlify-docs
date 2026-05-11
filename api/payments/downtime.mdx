@@ -1,0 +1,25 @@
+---
+title: "Payment Downtime"
+description: "Downtime is when one or more payment options underperform, leading to considerable delays in payment processing. These downtimes are due to technical issues or outages at Razorpay's partner or issuing banks."
+---
+
+ Razorpay [informs you about the downtime](/payments/payments/downtime-updates) to communicate it to your customers and display only the unaffected payment methods while accepting payments from them. You can poll the API or configure Webhooks to be notified of the downtimes and plan the remediation steps accordingly. Downtime communication for the payment methods such as cards, netbanking and UPI is available.
+
+ 
+ Fork the Razorpay Postman Public Workspace and try the Downtime APIs using your [Test API Keys](/api/authentication#generate-api-keys).
+
+ [](https://www.postman.com/razorpaydev/workspace/razorpay-public-workspace/folder/12492020-4270ff49-ebe0-478e-8d3d-e7c2c75b2e4d)
+
+### Related Guides
+
+[About Downtime](/payments/payments/downtime-updates)
+[Set Up Webhooks](/webhooks/setup-edit-payments)
+[Webhook Payloads](/webhooks/payments#payments-downtime)
+
+### Endpoints
+
+- **get** `/v1/payments/downtimes` - Fetch Payment Downtime Details: 
+ Retrieves details of Payment Downtime.
+
+- **get** `/v1/payments/downtimes/:id` - Fetch Payment Downtime Details With ID: 
+ Retrieves details of a Payment Downtime with id.

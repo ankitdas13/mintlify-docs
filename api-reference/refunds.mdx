@@ -1,0 +1,90 @@
+---
+title: 'Refunds API — create and retrieve payment refunds'
+description: 'Issue full or partial refunds on captured payments, choose normal or instant processing speed, and fetch refund status using the Razorpay Refunds API.'
+---
+
+You can issue a full or partial refund on any captured payment. Refunds are processed asynchronously — the status transitions from `pending` to `processed` or `failed`.
+
+---
+
+## Create a refund
+
+`POST /v1/payments/:id/refund`
+
+### Request parameters
+
+<ParamField body="amount" type="integer">
+  Amount to refund in the smallest currency unit. Omit this field to issue a full refund for the total payment amount.
+</ParamField>
+
+<ParamField body="speed" type="string">
+  Refund speed. Use `normal` for standard 5–7 business day processing, or `optimum` for instant refunds where available. Defaults to `normal`.
+</ParamField>
+
+<ParamField body="notes" type="object">
+  Key-value pairs for custom metadata. Maximum 15 keys, each value up to 256 characters.
+</ParamField>
+
+<ParamField body="receipt" type="string">
+  Your internal reference ID for this refund.
+</ParamField>
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.razorpay.com/v1/payments/pay_DJkTfWoJ5ZFPce/refund \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 50000,
+    "speed": "normal",
+    "notes": {
+      "reason": "Customer request"
+    },
+    "receipt": "refund_001"
+  }'
+```
+
+</CodeGroup>
+
+### Response
+
+```json
+{
+  "id": "rfnd_FP8QHiV938haTz",
+  "entity": "refund",
+  "amount": 50000,
+  "currency": "USD",
+  "payment_id": "pay_DJkTfWoJ5ZFPce",
+  "status": "processed",
+  "speed_processed": "normal",
+  "created_at": 1591097057
+}
+```
+
+<ResponseField name="id" type="string">
+  Unique refund identifier.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Refund status. One of `pending`, `processed`, or `failed`.
+</ResponseField>
+
+<ResponseField name="speed_processed" type="string">
+  The actual speed at which the refund was processed (`normal` or `instant`).
+</ResponseField>
+
+<ResponseField name="payment_id" type="string">
+  The payment ID against which this refund was issued.
+</ResponseField>
+
+---
+
+## Fetch a refund
+
+`GET /v1/refunds/:id`
+
+```bash
+curl -X GET https://api.razorpay.com/v1/refunds/rfnd_FP8QHiV938haTz \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET
+```

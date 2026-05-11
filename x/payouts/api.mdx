@@ -1,0 +1,108 @@
+---
+title: "Payouts APIs"
+description: "You can use the Razorpay's Payout APIs to perform various actions. You can perform most of these actions from the [RazorpayX Dashboard](https://x.razorpay.com/auth) as well."
+---
+
+**SUCCESS**
+
+**What's New**
+
+You can now initiate payouts directly to mobile numbers using the [Payout Composite API](/api/x/payout-composite/create/phone-number)
+
+<Warning>
+
+**Watch Out!**
+
+It is mandatory to [allowlist IPs](/x/dashboard/allowlist-ip) and pass the [idempotency key](/api/x/payout-idempotency/make-request) to make a successful payout.
+
+</Warning>
+## Payout APIs
+
+The table below lists the various endpoints and gives a brief description of each:
+
+API Endpoint | Description
+---
+[Creates a Payout to a Bank Account](/api/x/payouts/create/bank-account) | Create a payout to a bank account.
+---
+[Create a Payout to a VPA](/api/x/payouts/create/vpa) | Creates a payout to a VPA.
+---
+[Fetch a Payout with ID](/api/x/payouts/fetch-with-id) | Retrieves details of one payout via ID.
+---
+[Fetch all Payouts](/api/x/payouts/fetch-all) | Retrieves details of all the payouts.
+---
+[Cancel a Queued Payout](/api/x/payouts/cancel) | Cancels a payout in `queued` state.
+
+## Payout to Cards APIs
+
+The table below lists the various endpoints and gives a brief description of each:
+
+<Warning>
+
+**Watch Out!**
+
+Payouts via **Visa Direct** and **MasterCard Send** are temporarily unavailable. Please watch this space for further updates.
+
+API Endpoint | Description
+---
+[Make Payouts to Cards without saving cards](/api/x/payouts-cards/create/without-saving-card) | Make a payout to a card without saving card details.
+---
+[Create Fund Account](/api/x/payouts-cards/create/save-card/external-token/fund-account) to make Payouts to Externally Tokenised Card | Creates a fund account for a tokenised card via external tokenisation providers.
+---
+[Make Payouts to Externally Tokenised Card](/api/x/payouts-cards/create/save-card/external-token/payout) | Makes a payout to a tokenised card via external tokenisation providers.
+---
+[Create Fund Account](/api/x/payouts-cards/create/save-card/razorpay-tokenhq/fund-account) to make Payouts to Tokenised Card with Razorpay TokenHQ | Creates a fund account for a tokenised card via via Razorpay Token HQ.
+---
+[Make Payouts to Tokenised Card with Razorpay TokenHQ](/api/x/payouts-cards/create/save-card/razorpay-tokenhq/payout) | Makes a payout to a tokenised card via via Razorpay Token HQ.
+
+</Warning>
+## Payout Composite API
+
+The table below lists the various endpoints and gives a brief description of each:
+
+API Endpoint | Description
+---
+[Create a Composite Payout to Mobile Number](/api/x/payout-composite/create/phone-number) | Creates a payout to a contact's mobile number.
+---
+[Create a Composite Payout to Bank Account](/api/x/payout-composite/create/bank-account) | Creates a payout to a contact's bank account.
+---
+[Create a Composite Payout to VPA](/api/x/payout-composite/create/vpa) | Creates a payout to a contact's VPA (UPI).
+---
+[Create a Composite Payout to Card](/api/x/payout-composite/create/card) | Creates a payout to a contact's card.
+
+## Payout Approval API
+
+The table below lists the various endpoints and gives a brief description of each:
+
+API Endpoint | Description
+---
+[Approve Payout](/api/x/payouts-approval/approve) | Approves the payout.
+---
+[Reject Payout](/api/x/payouts-approval/reject) | Rejects the payout.
+
+## Payout Idempotency API
+
+The table below lists the various endpoints and gives a brief description of each:
+
+API Endpoint | Description
+---
+[Request Idempotent Payout](/api/x/payout-idempotency/make-request) | Requests for an idempotent payout.
+
+## Transactions APIs
+
+The table below lists the various endpoints and gives a brief description of each:
+
+API Endpoint | Description
+---
+[Fetch All Transactions](/api/x/transactions/fetch-all) | Retrieves all the transactions made from your business account. 
+---
+[Fetch Transaction with ID](/api/x/transactions/fetch-with-id) | Retrieves a particular transaction. 
+
+## Payout Status Details
+
+[Status details](/errors/x/payout-status-details) are sent as part of the fetch payout API response and webhook payloads. It provides additional details about each payout status. A payout update webhook is sent every time an attribute in status details changes.
+
+### Related Information
+
+- [Payouts](/x/payouts)
+- [Fund Account APIs](/x/fund-accounts/api)
+- [Subscribe to Webhooks](/x/apis/subscribe)

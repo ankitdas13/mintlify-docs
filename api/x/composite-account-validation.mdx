@@ -1,0 +1,34 @@
+---
+title: "Account Validation Composite"
+description: "Composite Account Validation API allows you to create a Contact [Linked Text](/api/x/contacts/create), the contact's Fund Account (bank account or UPI) and validate it in a single API call."
+---
+
+<Warning>
+
+**Watch Out!**
+
+Account Validation is not available in test mode and is possible only for RazorpayX Lite.
+
+To make an account validation transaction, you must [allowlist your IPs](/x/dashboard/allowlist-ip), [Create a Contact](/api/x/account-validation/create-contact) and Create a Fund Account for the Contact using either [bank account](/api/x/account-validation/bank-account/create-fund-account) or [VPA details](/api/x/account-validation/vpa/create-fund-account). 
+
+</Warning>
+### Related Guides
+ 
+[About Fund Account Validation](/x/fund-account-validation)
+[Set up Webhooks](/webhooks/setup-edit-payouts)
+[Webhooks Payloads](/webhooks/account-validation)
+
+### Endpoints
+ 
+
+- **post** `/v1/fund_accounts/validations` - Validate a Bank Account: 
+Creates and validates the contact's bank account.
+
+- **post** `/v1/fund_accounts/validations` - Validate a VPA: 
+Creates and validates the contact's virtual payment address or UPI fund account.
+
+- **get** `/v1/fund_accounts/validations?account_number={account number}` - Fetch All Account Validation Transactions: 
+Retrieves the details of all Fund Account Validation transactions you have made.
+
+- **get** `/v1/fund_accounts/validations/:id` - Fetch Account Validation Transactions With ID: 
+Retrieves particular Fund Account Validation transaction with its id.

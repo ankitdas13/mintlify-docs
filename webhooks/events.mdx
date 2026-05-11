@@ -1,0 +1,174 @@
+---
+title: 'Razorpay webhook events: payments, refunds, and subscriptions'
+description: 'Browse all Razorpay webhook events by category — payments, orders, refunds, settlements, and subscriptions — with payload structure and field reference.'
+---
+
+Razorpay sends a webhook notification each time a subscribed event occurs in your account. Every notification shares the same top-level payload structure, with the entity-specific data nested inside the `payload` object.
+
+## Payload structure
+
+Each webhook request body is a JSON object with the following shape:
+
+```json
+{
+  "entity": "event",
+  "account_id": "acc_BFQ7uQEaa7j2z7",
+  "event": "payment.captured",
+  "contains": ["payment"],
+  "payload": {
+    "payment": {
+      "entity": {
+        "id": "pay_DJkTfWoJ5ZFPce",
+        "entity": "payment",
+        "amount": 50000,
+        "currency": "USD",
+        "status": "captured",
+        "order_id": "order_DJkTfWoJ5ZFPce",
+        "method": "card",
+        "captured": true,
+        "created_at": 1591097057
+      }
+    }
+  },
+  "created_at": 1591097057
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `entity` | string | Always `"event"` for webhook payloads |
+| `account_id` | string | Your Razorpay account ID |
+| `event` | string | The event name, e.g. `payment.captured` |
+| `contains` | array | Entity types present in `payload` |
+| `payload` | object | Event-specific entity data |
+| `created_at` | integer | Unix timestamp of the event |
+
+<Note>
+  Use the `event` field to determine how to handle each payload. Do not infer event type from the payload contents alone.
+</Note>
+
+## Events by category
+
+<AccordionGroup>
+
+  <Accordion title="Payment events" icon="credit-card">
+    | Event | Description |
+    |---|---|
+    | `payment.authorized` | Payment has been authorized by the bank but not yet captured. Use this to capture late-authorized payments. |
+    | `payment.captured` | Payment has been captured successfully. Funds will be settled to your account. |
+    | `payment.failed` | Payment attempt failed. The `error_code` and `error_description` fields in the payload describe the reason. |
+    | `payment.dispute.created` | A chargeback or dispute has been raised against a payment. |
+
+    <Tip>
+      Subscribe to both `payment.authorized` and `payment.captured` if you use manual capture. `payment.authorized` fires first; you must capture within the authorization window or the funds are released.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="Order events" icon="bag-shopping">
+    | Event | Description |
+    |---|---|
+    | `order.paid` | All payments against an order are complete and the order is fully paid. Use this to trigger fulfillment and inventory updates. |
+  </Accordion>
+
+  <Accordion title="Refund events" icon="rotate-left">
+    | Event | Description |
+    |---|---|
+    | `refund.created` | A refund has been initiated. The funds have not yet left Razorpay. |
+    | `refund.processed` | The refund has been successfully processed and funds are on their way to the customer. |
+    | `refund.failed` | The refund attempt failed. Check the `error` field in the payload for the reason. |
+
+    <Note>
+      Refunds are processed asynchronously. A `refund.created` event does not guarantee that the customer has received the funds — wait for `refund.processed`.
+    </Note>
+  </Accordion>
+
+  <Accordion title="Settlement events" icon="building-columns">
+    | Event | Description |
+    |---|---|
+    | `settlement.processed` | Funds from captured payments have been settled to your bank account. |
+  </Accordion>
+
+  <Accordion title="Subscription events" icon="repeat">
+    | Event | Description |
+    |---|---|
+    | `subscription.activated` | Subscription has been activated and the first billing cycle has begun. |
+    | `subscription.charged` | A subscription billing cycle payment succeeded. |
+    | `subscription.completed` | All billing cycles in the subscription plan are complete. |
+    | `subscription.cancelled` | Subscription has been cancelled, either by you or the customer. |
+    | `subscription.halted` | Maximum retry attempts for a failed charge have been reached. The subscription is paused. |
+    | `subscription.pending` | A subscription charge is pending, typically while awaiting bank confirmation. |
+  </Accordion>
+
+  <Accordion title="Payment link events" icon="link">
+    | Event | Description |
+    |---|---|
+    | `payment_link.paid` | The Payment Link has been fully paid. |
+    | `payment_link.partially_paid` | A partial payment has been received against the Payment Link. |
+    | `payment_link.cancelled` | The Payment Link has been cancelled and can no longer accept payments. |
+    | `payment_link.expired` | The Payment Link has passed its expiry date without being fully paid. |
+  </Accordion>
+
+</AccordionGroup>
+
+## Example: `payment.captured` payload
+
+The following is a complete example payload for the `payment.captured` event, which is the most commonly used event for triggering post-payment automation such as order fulfillment.
+
+```json
+{
+  "entity": "event",
+  "account_id": "acc_BFQ7uQEaa7j2z7",
+  "event": "payment.captured",
+  "contains": ["payment"],
+  "payload": {
+    "payment": {
+      "entity": {
+        "id": "pay_DJkTfWoJ5ZFPce",
+        "entity": "payment",
+        "amount": 50000,
+        "currency": "USD",
+        "status": "captured",
+        "order_id": "order_DJkTfWoJ5ZFPce",
+        "invoice_id": null,
+        "international": false,
+        "method": "card",
+        "amount_refunded": 0,
+        "refund_status": null,
+        "captured": true,
+        "description": "Order #1234",
+        "card_id": "card_DJkTfWoJ5ZFPce",
+        "bank": null,
+        "wallet": null,
+        "vpa": null,
+        "email": "customer@example.com",
+        "contact": "+919999999999",
+        "notes": {
+          "order_ref": "ORD-1234"
+        },
+        "fee": 1180,
+        "tax": 180,
+        "error_code": null,
+        "error_description": null,
+        "created_at": 1591097057
+      }
+    }
+  },
+  "created_at": 1591097057
+}
+```
+
+Key fields in the `payment` entity:
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Unique payment ID — use this as your idempotency key |
+| `amount` | integer | Amount in the smallest currency unit (paise for INR, cents for USD) |
+| `currency` | string | ISO 4217 currency code |
+| `status` | string | Payment status: `authorized`, `captured`, `failed`, `refunded` |
+| `order_id` | string | Associated Razorpay order ID, if any |
+| `method` | string | Payment method: `card`, `netbanking`, `wallet`, `upi`, `emi` |
+| `captured` | boolean | `true` when the payment has been captured |
+| `fee` | integer | Razorpay fee charged (in smallest currency unit) |
+| `tax` | integer | GST on the Razorpay fee |
+| `notes` | object | Custom key-value pairs you attached when creating the order |
+| `created_at` | integer | Unix timestamp of when the payment was created |

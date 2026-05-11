@@ -1,0 +1,88 @@
+---
+title: 'Integrate Razorpay checkout in your iOS app with Swift'
+description: 'Integrate Razorpay Standard Checkout into your native iOS app using the Swift SDK to accept payments with cards, wallets, and more payment modes.'
+---
+
+The Razorpay iOS SDK embeds a native checkout experience in your iOS app. You initialize it with your API key, pass an options dictionary containing the order details, and handle success or error through a delegate protocol.
+
+## Installation
+
+Install the SDK using your preferred dependency manager:
+
+<Tabs>
+  <Tab title="CocoaPods">
+    Add the pod to your `Podfile`, then run `pod install`:
+
+    ```ruby Podfile
+    pod 'razorpay-pod'
+    ```
+  </Tab>
+  <Tab title="Swift Package Manager">
+    In Xcode, go to **File → Add Package Dependencies** and enter the Razorpay iOS SDK repository URL. Select the version you want to use and add it to your target.
+  </Tab>
+</Tabs>
+
+## Integration steps
+
+<Steps>
+  <Step title="Create an order on your server">
+    Before opening checkout, create an order from your backend using the Razorpay API and return the `order_id` to your app. See the [web integration guide](/payment-gateway/web-integration) for a server-side example — the order creation API is the same across all platforms.
+  </Step>
+
+  <Step title="Initialize the SDK and open checkout">
+    Import the Razorpay SDK, conform your view controller to `RazorpayPaymentCompletionProtocol`, and open checkout when the customer is ready to pay.
+
+    ```swift ViewController.swift
+    import Razorpay
+
+    class ViewController: UIViewController, RazorpayPaymentCompletionProtocol {
+
+        var razorpay: RazorpayCheckout!
+
+        override func viewDidLoad() {
+            super.viewDidLoad()
+            razorpay = RazorpayCheckout.initWithKey("rzp_test_YOUR_KEY_ID", andDelegate: self)
+        }
+
+        func openCheckout() {
+            let options: [String: Any] = [
+                "amount": "50000",
+                "currency": "USD",
+                "description": "Order #12345",
+                "order_id": "order_IluGWxBm9U8zJ8",
+                "name": "Your Business",
+                "prefill": [
+                    "contact": "9000000000",
+                    "email": "customer@example.com"
+                ],
+                "theme": ["color": "#1d4ed8"]
+            ]
+            razorpay.open(options)
+        }
+
+        func onPaymentSuccess(_ payment_id: String) {
+            print("Payment succeeded: \(payment_id)")
+            // Send payment_id to your server for signature verification
+        }
+
+        func onPaymentError(_ code: Int32, description str: String) {
+            print("Payment error: \(str)")
+        }
+    }
+    ```
+
+    The `amount` is specified in the smallest currency unit (for example, paise for INR or cents for USD). Pass the `order_id` you received from your server.
+  </Step>
+
+  <Step title="Verify the payment signature on your server">
+    After `onPaymentSuccess` is called, send the `payment_id` along with the `order_id` and `razorpay_signature` to your server for verification. Use the same signature verification logic described in the [web integration guide](/payment-gateway/web-integration).
+  </Step>
+</Steps>
+
+<Warning>
+  Always verify the payment signature on your server before fulfilling an order. The `onPaymentSuccess` callback alone does not confirm that the payment is authentic.
+</Warning>
+
+<Note>
+  Your Key ID is safe to include in your iOS app binary. Never include your Key Secret in client-side code — it must remain on your server only.
+</Note>

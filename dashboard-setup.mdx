@@ -1,0 +1,139 @@
+---
+title: "Razorpay Dashboard Setup: Account, KYC, and API Keys"
+description: "Create your Razorpay account, complete KYC verification, generate API keys, add team members, and configure webhooks before going live."
+---
+
+The Razorpay Dashboard is your central workspace for managing payments, settings, and integrations. This guide walks you through creating an account, unlocking Live Mode through KYC, and configuring the settings you need before going live.
+
+## Create your account
+
+<Steps>
+  <Step title="Sign up at dashboard.razorpay.com/signup">
+    Go to [dashboard.razorpay.com/signup](https://dashboard.razorpay.com/signup) and enter your business email and a password. Razorpay will send a verification email — click the link to confirm your address.
+  </Step>
+  <Step title="Enter your business details">
+    Provide your business name, type (individual, partnership, private limited, etc.), and the category that best describes your business. These details determine which payment methods are available to you.
+  </Step>
+  <Step title="Log in to the Dashboard">
+    After verification, log in at [dashboard.razorpay.com](https://dashboard.razorpay.com). Your account starts in **Test Mode**, which means you can build and test your integration immediately without KYC.
+  </Step>
+</Steps>
+
+## Complete KYC for Live Mode
+
+Test Mode lets you build without any paperwork, but you must complete KYC verification before accepting real payments. The approval process typically takes **24–48 hours** after you submit all required documents.
+
+<Steps>
+  <Step title="Open the KYC section">
+    In the Dashboard, click **Account & Settings** and then select **Business KYC** (or look for the banner prompting you to activate your account).
+  </Step>
+  <Step title="Submit business and owner documents">
+    Upload the documents Razorpay requests for your business type. Common requirements include:
+
+    - PAN card (business and personal)
+    - Address proof (utility bill, bank statement)
+    - Bank account details for settlements
+    - Certificate of incorporation (for companies)
+  </Step>
+  <Step title="Wait for verification">
+    Razorpay's team reviews your submission and notifies you by email. Once approved, your account switches to Live Mode and your `rzp_live_` keys become active.
+  </Step>
+</Steps>
+
+<Note>
+  You can continue building in Test Mode while KYC is under review. Your integration does not change when you go live — you only swap your API keys.
+</Note>
+
+## Navigate the Dashboard
+
+The Dashboard sidebar groups your tools into these main sections:
+
+- **Transactions** — view payments, refunds, transfers, and disputes.
+- **Orders** — track orders and their associated payments.
+- **Settlements** — see your settlement schedule and download reports.
+- **Payment Links** — create and manage links for no-code payment collection.
+- **Subscriptions** — manage recurring billing plans and subscribers.
+- **Account & Settings** — manage API keys, webhooks, team members, and business profile.
+
+## Generate API keys
+
+API keys authenticate your server-side requests to `https://api.razorpay.com/v1`. You need a **Key ID** and a **Key Secret** for each environment.
+
+<Steps>
+  <Step title="Go to API Keys settings">
+    In the Dashboard, click **Account & Settings**, then select **API Keys**.
+  </Step>
+  <Step title="Generate a key for your environment">
+    Select the environment (Test or Live) and click **Generate Key**. The Dashboard displays your **Key ID** and **Key Secret**.
+  </Step>
+  <Step title="Copy and store your Key Secret">
+    Copy the Key Secret immediately and store it in a secure location such as a secrets manager or environment variable. The Dashboard does not show the Key Secret again after you close the dialog.
+  </Step>
+</Steps>
+
+<Warning>
+  If you lose your Key Secret, you must regenerate the key pair. Regenerating keys invalidates the previous secret, so update your integration with the new credentials promptly to avoid downtime.
+</Warning>
+
+**Key prefixes by environment:**
+
+| Environment | Key ID prefix | Use case |
+|---|---|---|
+| Test Mode | `rzp_test_` | Development and QA |
+| Live Mode | `rzp_live_` | Production traffic |
+
+<Note>
+  Only team members with the **Owner** or **Admin** role can view and generate API keys. Members with other roles do not have access to this section.
+</Note>
+
+## Add team members
+
+<Steps>
+  <Step title="Open team management">
+    Go to **Account & Settings → Business settings → Manage Team**.
+  </Step>
+  <Step title="Invite a new member">
+    Click **Invite New Member**, enter the person's email address, and select a role.
+
+    Available roles include Owner, Admin, Manager, Operations, Finance, and Developer. Each role has a different permission set — assign the least-privileged role that covers the person's responsibilities.
+  </Step>
+  <Step title="Member accepts the invitation">
+    Razorpay sends an invitation email. The invitee must accept it to gain access to the Dashboard.
+  </Step>
+</Steps>
+
+## Configure webhooks
+
+Webhooks let Razorpay notify your server when events occur — such as a payment being captured, a refund being processed, or a subscription renewing. This keeps your backend in sync without requiring you to poll the API.
+
+<Steps>
+  <Step title="Open webhook settings">
+    Go to **Account & Settings → Webhooks**, then click **Add New Webhook**.
+  </Step>
+  <Step title="Enter your endpoint URL">
+    Provide the HTTPS URL on your server that will receive webhook payloads. Razorpay sends a POST request with a JSON body to this URL when events occur.
+  </Step>
+  <Step title="Select events to subscribe to">
+    Choose the event types relevant to your integration, such as `payment.captured`, `refund.created`, or `subscription.charged`. Subscribing only to the events you need reduces noise.
+  </Step>
+  <Step title="Save your webhook secret">
+    Razorpay generates a webhook secret for signature verification. Store this secret securely and use it to validate that incoming webhook requests originate from Razorpay.
+  </Step>
+</Steps>
+
+<Tip>
+  Verify the `X-Razorpay-Signature` header on every incoming webhook request before processing the payload. This prevents your endpoint from acting on forged requests.
+</Tip>
+
+## Configure payment capture settings
+
+By default, Razorpay authorizes and captures payments in a single step. If your workflow requires manual review before capturing funds, you can enable manual capture.
+
+Go to **Account & Settings → Payment Capture Settings** and choose one of the following:
+
+- **Automatic** — payments are captured immediately upon authorization. This is the default and suits most integrations.
+- **Manual** — payments are authorized but not captured. You must explicitly capture each payment within the capture window (typically 5 days), after which it is automatically reversed.
+
+<Warning>
+  Authorized payments that are not captured within the capture window are automatically reversed. Ensure your team has a process in place to capture payments on time if you enable manual capture.
+</Warning>

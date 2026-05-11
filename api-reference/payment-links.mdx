@@ -1,0 +1,122 @@
+---
+title: 'Payment Links API — create and manage payment links'
+description: 'Create shareable payment links, send them to customers via SMS or email, and manage their lifecycle using the Razorpay Payment Links API.'
+---
+
+Payment Links let you collect payments without building a checkout flow. You generate a link, share it with your customer, and Razorpay handles the payment page. You can send notifications automatically via SMS and email.
+
+---
+
+## Create a payment link
+
+`POST /v1/payment_links`
+
+<ParamField body="amount" type="integer" required>
+  Amount in the smallest currency unit (paise for INR, cents for USD).
+</ParamField>
+
+<ParamField body="currency" type="string" required>
+  ISO 4217 currency code.
+</ParamField>
+
+<ParamField body="description" type="string">
+  Description shown to the customer on the payment page.
+</ParamField>
+
+<ParamField body="customer" type="object">
+  Customer details used to pre-fill the checkout form and send notifications.
+
+  <Expandable title="properties">
+    <ParamField body="name" type="string">
+      Customer's full name.
+    </ParamField>
+    <ParamField body="email" type="string">
+      Customer's email address.
+    </ParamField>
+    <ParamField body="contact" type="string">
+      Customer's phone number including country code.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="notify" type="object">
+  Controls automatic notification delivery.
+
+  <Expandable title="properties">
+    <ParamField body="sms" type="boolean">
+      Send the link to the customer via SMS.
+    </ParamField>
+    <ParamField body="email" type="boolean">
+      Send the link to the customer via email.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="reminder_enable" type="boolean">
+  Enable automatic payment reminders for this link.
+</ParamField>
+
+<ParamField body="expire_by" type="integer">
+  Unix timestamp after which the link expires.
+</ParamField>
+
+```bash
+curl -X POST https://api.razorpay.com/v1/payment_links \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 1000,
+    "currency": "USD",
+    "description": "Payment for Invoice #12345",
+    "customer": {
+      "name": "Jane Doe",
+      "email": "jane.doe@example.com",
+      "contact": "+19000000000"
+    },
+    "notify": {
+      "sms": true,
+      "email": true
+    },
+    "reminder_enable": true,
+    "expire_by": 1893456000
+  }'
+```
+
+---
+
+## Fetch a payment link
+
+`GET /v1/payment_links/:id`
+
+```bash
+curl -X GET https://api.razorpay.com/v1/payment_links/plink_ERgihyaAAC0VNW \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET
+```
+
+---
+
+## Update a payment link
+
+`PATCH /v1/payment_links/:id`
+
+You can update the expiry time and reminder settings on a payment link that has not yet been paid or cancelled.
+
+```bash
+curl -X PATCH https://api.razorpay.com/v1/payment_links/plink_ERgihyaAAC0VNW \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET \
+  -H "Content-Type: application/json" \
+  -d '{"expire_by": 1893456000, "reminder_enable": false}'
+```
+
+---
+
+## Cancel a payment link
+
+`POST /v1/payment_links/:id/cancel`
+
+Cancelling a link prevents any further payments. This action cannot be undone.
+
+```bash
+curl -X POST https://api.razorpay.com/v1/payment_links/plink_ERgihyaAAC0VNW/cancel \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET
+```

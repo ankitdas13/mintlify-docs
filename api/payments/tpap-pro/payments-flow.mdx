@@ -1,0 +1,56 @@
+---
+title: "Payments"
+description: "Razorpay's TPAP Pro - Payments APIs lets you manage different transactions such as make and collect payments, approve and reject collect requests. You can also fetch the list of transactions using the API."
+---
+
+ Below are the steps to integrate TPAP Pro. You can also refer to our comprehensive [TPAP Pro integration guide](/payments/tpap-pro/integration-guide).
+
+<Steps>
+<Step title="[Customer Onboarding](/api/payments/tpap-pro/customer-onboarding)">
+[Customer Onboarding](/api/payments/tpap-pro/customer-onboarding)
+</Step>
+<Step title="[Manage Funds and Account](/api/payments/tpap-pro/funds-account-man...">
+[Manage Funds and Account](/api/payments/tpap-pro/funds-account-management)
+</Step>
+<Step title="Payments">
+Payments
+</Step>
+<Step title="[Mandates](/api/payments/tpap-pro/mandate-flow)">
+[Mandates](/api/payments/tpap-pro/mandate-flow)
+</Step>
+<Step title="[Complaints](/api/payments/tpap-pro/complaints-flow)">
+[Complaints](/api/payments/tpap-pro/complaints-flow)
+</Step>
+<Step title="[UPI Numbers](/api/payments/tpap-pro/upi-number)">
+[UPI Numbers](/api/payments/tpap-pro/upi-number)
+</Step>
+<Step title="[UPI Lite](/api/payments/tpap-pro/fundsource-lite)">
+[UPI Lite](/api/payments/tpap-pro/fundsource-lite)
+</Step>
+</Steps>
+ 
+
+### Related Guides
+
+[About TPAP Pro](/payments/tpap-pro)
+[Integrate With TPAP Pro](/payments/tpap-pro/integration-guide)
+
+### Endpoints
+
+- **post** `/v1/upi/tpap/vpa/resolve` - Resolve VPAs: 
+ Resolves a VPA.
+
+- **post** `/v1/payments/pay` - Make a Payment: 
+ Makes a payment.
+
+- **post** `/v1/payments/collect` - Collect a Payment: 
+ Collects a payment.
+
+- **post** `/v1/payments/:upi_transaction_id/approve` - Approve a Collect Request: 
+ Approves a collect request.
+
+- **post** `/v1/payments/:upi_transaction_id/reject` - Reject a Collect Request: 
+ Rejects a collect request.
+
+- **get** `/v1/upi/tpap/paymentsrefresh=true&upi_transaction_id=RZPkbnkb98scbkhbnj89b&reference_id=RSKwpINfSkdEvtdxf&type=collect&status=deemed` - Fetch Payments: 
+ Fetch a list of payments.

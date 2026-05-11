@@ -1,0 +1,35 @@
+---
+title: 'Test Mode: simulate payments with Razorpay test credentials'
+description: 'Use Razorpay Test Mode to simulate payments with test card numbers and UPI IDs — no real money is processed, KYC is not required.'
+---
+
+Test Mode lets you build and test your Razorpay integration without moving real money. All API behaviour is identical to Live Mode — the only difference is that transactions are simulated.
+
+Use `rzp_test_*` keys for all Test Mode API calls. You can switch between modes in the Razorpay Dashboard using the **Test / Live** toggle in the top navigation bar.
+
+## Test card numbers
+
+Use the following card numbers when testing checkout flows. Any future expiry date, any 3-digit CVV, and any cardholder name are accepted.
+
+| Scenario | Card number |
+|----------|-------------|
+| Successful payment | `4111 1111 1111 1111` (Visa) |
+| 3D Secure success | `4111 1111 1111 1111` — enter OTP `1234` |
+| Failed payment | `4000 0000 0000 0002` |
+
+## Test UPI IDs
+
+| Scenario | UPI ID |
+|----------|--------|
+| Successful payment | `success@razorpay` |
+| Failed payment | `failure@razorpay` |
+
+## Switching modes
+
+1. Log in to the [Razorpay Dashboard](https://dashboard.razorpay.com).
+2. Use the **Test Mode / Live Mode** toggle at the top of the page.
+3. Generate separate API keys for each mode from **Account & Settings → API Keys**.
+
+<Note>
+Test Mode transactions never appear in your Live Mode dashboard, and vice versa. Always verify you are using the correct key prefix (`rzp_test_*` vs `rzp_live_*`) before going live.
+</Note>

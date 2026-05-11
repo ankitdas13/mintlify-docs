@@ -1,0 +1,111 @@
+---
+title: "Route APIs"
+description: "You can use the Route APIs to perform various actions. You can perform all of these actions from the Dashboard as well."
+---
+
+## API-wise Integration Checklist for Route
+
+- Ensure the currency is in INR when creating an `order_id`.
+- Ensure orders created have the `partial_payment` parameter set to `false`. Transfers will only occur if the orders are paid and the payments move to the `captured` state.
+- Ensure to pass the Linked Account id while creating an order.
+- Ensure the amount passed in the `transfers` object is not greater than the order amount.
+- If the amount passed in the `transfers` object is less than the main amount, the balance will automatically move to the Razorpay nodal account.
+
+**Example:**
+
+Amount Type | Amount INR
+---
+Base amount | 10,000
+---
+Amount in `transfers` object | 7,500
+---
+Balance amount (Automatically added to the main Razorpay nodal account) | 2,500
+
+- Once the payment has been successfully made, verify the [Payment Signature](/payments/third-party-validation#step-6-verify-signature) at your backend.
+- You can use [Fetch Transfer for an Order](/api/payments/route) API for reconciliation.
+- You can also [subscribe to Webhooks](/webhooks/setup-edit-payments) and set up the `transfer.processed` Webhook event.
+
+- Use [Fetch a Payment by ID](/api/payments/fetch-with-id) API to confirm the payment status before running the [Transfers](/api/payments/route) API.
+- Ensure the payment is in the `captured` state.
+- Ensure the amount does not exceed the initial payment amount.
+- Ensure the amount you want to transfer to a Linked Account is less than the initial amount.
+    
+<Warning>
+
+**Watch Out!**
+
+You must subtract fees and tax to calculate the amount allowed to be transferred.
+
+- Ensure the nodal account has sufficient balance for the amount to be transferred.
+- Ensure the amount that needs to be transferred is correct as there is no `maker-checker` facility after creating the transfer.
+- Ensure the currency is in INR.
+
+  
+</Warning>
+### List of Transfers APIs
+
+        The table below provides the list of various Transfers APIs and their brief description:
+
+        
+
+        API | Description
+        ---
+        [Create Transfers from Orders](/api/payments/route/create-transfers-orders) | API to create Transfers from the received Orders
+        ---
+        [Create Transfers from Payments](/api/payments/route/create-transfers-payments) | API to create Transfers to linked accounts once the payments are captured.
+        ---
+        [Direct Transfers](/api/payments/route/direct-transfers) | API to transfer funds directly from your account balance to the linked accounts
+        ---
+        [Fetch Transfers for a Payment](/api/payments/route/fetch-transfers-payment) | API to fetch transfers created for a specific payment
+        ---
+        [Fetch Transfer for an Order](/api/payments/route/fetch-transfer-order) | API to fetch transfers created for a specific Order ID
+        ---
+        [Fetch a Transfer](/api/payments/route/fetch-a-transfer) | API to view specific transfer details
+        ---
+        [Fetch Transfers for a Settlement](/api/payments/route/fetch-transfers-for-a-settlement) | API to retrieve the collection of transfers created for a particular Settlement ID
+        ---
+        [Fetch Settlement Details](/api/payments/route/fetch-settlement-details) | API to view the details of settlements made to linked accounts
+        ---
+        [Fetch Payments of a Linked Account](/api/payments/route/fetch-payments-linked-account) | API to view all the payments received by a linked account
+        ---
+        [Refund Payments and Reverse Transfer from a Linked Account](/api/payments/route/refund-payments-and-reverse-transfer) | API to initiate a payment refund to a customer
+        ---
+        [Reverse a Transfer](/api/payments/route/reverse-a-transfer) | API to initiate a reversal of funds from the linked account to your account
+        ---
+        [API to modify Settlement Hold for Transfers](/api/payments/route/modify-settlement-hold) | API to modify the settlement configuration for a particular `transfer_id`
+        
+
+  
+
+  
+### List of Linked Account APIs
+
+    The table below provides the list of various Linked Account APIs and their brief description:
+
+    
+
+    API | Description
+    ---
+    [Create a Linked Account](/api/payments/route/create-linked-account) | API to create a Linked Account. 
+    ---
+    [Update Linked Accounts](/api/payments/route/update-linked-accounts) | API to update Linked Accounts.
+    ---
+    [Fetch a Linked Account](/api/payments/route/fetch-with-id) | API to retrieve details of a Linked Account.
+    ---
+    [Create a Stakeholder](/api/payments/route/create-stakeholder) | API to create a Stakeholder account.
+    ---
+    [Update a Stakeholder Account](/api/payments/route/update-stakeholder) | API to update a Stakeholder account.
+    ---
+    [Request a Product Configuration](/api/payments/route/request-product-config) | API to request a product configuration.
+    ---
+    [Update a Product Configuration](/api/payments/route/update-product-config) | API to update a product configuration.
+    ---
+    [Fetch a Product Configuration](/api/payments/route/fetch-product-config) | API to fetch a product configuration.
+    
+
+   
+
+### Related Information
+- [Route](/payments/route)
+- [Linked Accounts](/payments/route/linked-account)
+- [Reports](/payments/route/view-reports)

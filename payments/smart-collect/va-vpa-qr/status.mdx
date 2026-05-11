@@ -1,0 +1,16 @@
+---
+title: "Virtual Account Status"
+description: "The virtual account is Active or Closed state in its life cycle."
+---
+
+## Active
+
+When you create a virtual account via [Dashboard](/payments/smart-collect/va-vpa-qr/dashboard/create) or [API](/payments/smart-collect/va-vpa-qr/api/create), it is `active` and ready to accept payments.
+
+## Closed
+
+You can close a virtual account using any of the following methods:
+- Automatically, by using the `close_by` option at the time of virtual account creation, via [Dashboard](/payments/smart-collect/va-vpa-qr/dashboard/create) or [API](/payments/smart-collect/va-vpa-qr/api/create).
+- Manually, from the [Dashboard](/payments/smart-collect/va-vpa-qr/dashboard/close) or using the [API](/payments/smart-collect/va-vpa-qr/api/close).
+
+Once the account is in the `closed` state, your customers cannot make payments to that closed account.

@@ -1,0 +1,47 @@
+---
+title: "Bulk Upload Status"
+description: "Check the status of your Bulk Upload file after you [upload it to your RazorpayX Dashboard](/x/bulk-payouts#upload-and-process-file)."
+---
+
+## How it Works
+
+The sample template can create fund accounts or process payouts in bulk. To do so:
+<Steps>
+<Step title="Download the required template from the [Dashboard](https://x.razor...">
+Download the required template from the [Dashboard](https://x.razorpay.com/), or find the [sample template here](/x/bulk-payouts#sample-template).
+</Step>
+<Step title="Add the required data to the template.">
+Add the required data to the template.
+</Step>
+<Step title="Upload the template via the [RazorpayX Dashboard](https://x.razorpa...">
+Upload the template via the [RazorpayX Dashboard](https://x.razorpay.com/).
+</Step>
+</Steps>
+
+## Bulk Upload Status
+
+After you upload your Bulk Upload file to the Dashboard, it moves through the following statuses:
+
+- `created`: 
+
+    This is the initial status of the Bulk Upload. It indicates that the Bulk Upload is created in the RazorpayX database and is ready to be processed. 
+ No processing is done at this point, that is, the payouts are not created.
+
+- `processed`: 
+
+    A Bulk Upload file reaches this final status when the uploaded details are processed. 
+
+After the Bulk Upload is processed, you receive an email with a summary of how many rows of data were successfully processed. You can [download the Bulk Upload report](/x/bulk-payouts/report) to understand the summary in more detail.
+
+<Warning>
+
+**Watch Out!**
+
+- Bulk Upload having the `processed` status does not mean the Contacts, Fund accounts or the Payouts were created and processed. It just means that the bulk file was fully processed.
+- The Contacts, Fund account or Payouts may or may not have been created or processed. Download the [Bulk Upload report](/x/bulk-payouts/report) to check these details.
+
+</Warning>
+### Related Information
+
+- [About Bulk Payouts](/x/bulk-payouts)
+- [Bulk Payouts Life Cycle](/x/bulk-payouts/life-cycle)

@@ -1,0 +1,99 @@
+---
+title: "About Fund Accounts"
+description: "Fund accounts are accounts associated with a [Contact](/x/contacts) (similar to a *beneficiary* in your netbanking portal)."
+---
+
+- To make a payout to a Contact, you must add a Fund Account to the Contact. 
+- There is no limitation to the number of Fund accounts a Contact can have.
+## Fund Account Types
+
+Fund accounts are associated with a Contact. Payouts are made to the Fund accounts. There are three types of fund accounts:
+
+- **Bank account**: Make payouts to a beneficiary's bank account via bank transfer using one of the available such as NEFT or IMPS.
+- **UPI ID (VPA)**: Make payouts to a beneficiary's UPI ID via a UPI transfer.
+- **Cards**: Know more about [Payouts to Cards](/api/x/payouts-cards).
+    - **Credit Card**: Make payouts directly to a beneficiary's credit card by bank transfer using NEFT or IMPS.
+    - **Debit Card or Prepaid Card**: Make payouts directly to a beneficiary's debit card or prepaid card using the 'card' mode.
+- **Wallet**: Make payouts to your beneficiary's wallet. You can make payouts to a beneficiary via an Amazon Pay gift card. Know more about [Payouts to Amazon Pay Wallet](/api/x/payout-wallet).
+
+Know about the [payout modes available for each Fund account type](/x/payouts#payout-modes-and-tat) and the [list of banks/cards supported](/x/payouts/cards#banks).
+
+## Fund Account Actions
+
+The following table lists down the actions that can be performed on Fund accounts using APIs, Dashboard and Bulk Upload:
+
+Action | API | Dashboard | Bulk Upload
+---
+Create a fund account | ✓ | ✓ | ✓
+---
+View fund account details | ✓ | ✓ | ✓
+---
+Mark as inactive | ✓ | ✓ | x
+
+You can create Fund accounts using APIs either with [bank account](/api/x/fund-accounts/create/bank-account) details or [VPA](/api/x/fund-accounts/create/vpa), or [create contacts in bulk](/x/contacts/bulk-uploads).
+
+## Dashboard Actions
+
+After logging in to your RazorpayX account, you can start creating a contact and its associated fund account. Refer below for steps on how to create a contact with a fund account, and how to update it.
+
+### Create a Contact with Fund Account 
+
+To create a Contact with Fund Account from the Dashboard:
+
+<Steps>
+<Step title="Log in to the [RazorpayX Dashboard](https://x.razorpay.com/).">
+Log in to the [RazorpayX Dashboard](https://x.razorpay.com/).
+</Step>
+<Step title="Navigate to **Contacts**.">
+Navigate to **Contacts**.
+</Step>
+<Step title="Click **+ CONTACT**.">
+Click **+ CONTACT**.
+</Step>
+<Step title="Fill Contact details and click **NEXT**.">
+Fill Contact details and click **NEXT**.
+</Step>
+<Step title="Add Fund Account details.">
+Add Fund Account details.
+</Step>
+<Step title="Click **SAVE AND CLOSE**.">
+Click **SAVE AND CLOSE**.
+</Step>
+</Steps>
+
+### Add New Fund Account
+
+To add a new Fund Account to an existing Contact from the Dashboard:
+
+<Steps>
+<Step title="Log in to the [RazorpayX Dashboard](https://x.razorpay.com/).">
+Log in to the [RazorpayX Dashboard](https://x.razorpay.com/).
+</Step>
+<Step title="Navigate to **Contacts**.">
+Navigate to **Contacts**.
+</Step>
+<Step title="Select the Contact you want to edit.">
+Select the Contact you want to edit.
+</Step>
+<Step title="Click **ADD FUND ACCOUNT**.">
+Click **ADD FUND ACCOUNT**.
+</Step>
+<Step title="Add the Fund Account details.">
+Add the Fund Account details.
+</Step>
+<Step title="Click **SAVE AND CLOSE**.">
+Click **SAVE AND CLOSE**.
+</Step>
+</Steps>
+
+You can also [create and update Fund Account using APIs](/api/x/fund-accounts#list-of-endpoints). 
+
+### Next Steps
+
+- [Fund Account Validation](/x/fund-account-validation)
+
+### Related Information
+
+- [Payouts](/x/payouts)
+- [Contacts](/x/contacts)
+- [Fund Account APIs](/x/fund-accounts/api)

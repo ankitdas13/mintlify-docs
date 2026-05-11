@@ -1,0 +1,118 @@
+---
+title: 'Payments API — fetch, capture, and list payments'
+description: 'Fetch payment details by ID, capture authorized payments before the window closes, and list payments using the Razorpay Payments API.'
+---
+
+The Payments API lets you retrieve payment details, capture authorized payments, and list payments. Payments are created automatically when a customer completes checkout — you do not create payments directly.
+
+---
+
+## Fetch a payment
+
+`GET /v1/payments/:id`
+
+```bash
+curl -X GET https://api.razorpay.com/v1/payments/pay_DJkTfWoJ5ZFPce \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET
+```
+
+### Response fields
+
+<ResponseField name="id" type="string">
+  Unique payment identifier.
+</ResponseField>
+
+<ResponseField name="entity" type="string">
+  Always `"payment"`.
+</ResponseField>
+
+<ResponseField name="amount" type="integer">
+  Payment amount in the smallest currency unit (paise for INR, cents for USD).
+</ResponseField>
+
+<ResponseField name="currency" type="string">
+  ISO 4217 currency code.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Payment status. One of `created`, `authorized`, `captured`, `refunded`, or `failed`.
+</ResponseField>
+
+<ResponseField name="order_id" type="string">
+  The order ID associated with this payment.
+</ResponseField>
+
+<ResponseField name="method" type="string">
+  Payment method used. One of `card`, `netbanking`, `wallet`, or `upi`.
+</ResponseField>
+
+<ResponseField name="captured" type="boolean">
+  `true` if the payment has been captured.
+</ResponseField>
+
+<ResponseField name="description" type="string">
+  Description provided at checkout.
+</ResponseField>
+
+<ResponseField name="email" type="string">
+  Customer email address.
+</ResponseField>
+
+<ResponseField name="contact" type="string">
+  Customer phone number.
+</ResponseField>
+
+<ResponseField name="created_at" type="integer">
+  Unix timestamp of when the payment was created.
+</ResponseField>
+
+---
+
+## Capture a payment
+
+`POST /v1/payments/:id/capture`
+
+Capturing a payment transfers the authorized funds. You must capture a payment within 5 days of authorization (or your configured capture timeout). Uncaptured payments are automatically refunded.
+
+<Warning>
+Always capture for the exact `amount` and `currency` of the original payment. Capturing a different amount will fail.
+</Warning>
+
+<ParamField body="amount" type="integer" required>
+  Amount to capture in the smallest currency unit. Must match the original payment amount.
+</ParamField>
+
+<ParamField body="currency" type="string" required>
+  ISO 4217 currency code. Must match the payment currency.
+</ParamField>
+
+```bash
+curl -X POST https://api.razorpay.com/v1/payments/pay_DJkTfWoJ5ZFPce/capture \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET \
+  -H "Content-Type: application/json" \
+  -d '{"amount": 50000, "currency": "USD"}'
+```
+
+---
+
+## List payments
+
+`GET /v1/payments`
+
+### Query parameters
+
+<ParamField query="count" type="integer">
+  Number of payments to return. Maximum `100`.
+</ParamField>
+
+<ParamField query="skip" type="integer">
+  Number of payments to skip for pagination.
+</ParamField>
+
+<ParamField query="from" type="integer">
+  Unix timestamp. Returns payments created on or after this time.
+</ParamField>
+
+<ParamField query="to" type="integer">
+  Unix timestamp. Returns payments created on or before this time.
+</ParamField>

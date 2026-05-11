@@ -1,0 +1,37 @@
+---
+title: "Fund Accounts"
+description: "Every Contact has an associated Fund Account. When you [make payouts](/x/payouts) to a Contact, they receive the amount in their Fund Account. Fund Accounts can be of [four type..."
+---
+
+Every Contact has an associated Fund Account. When you [make payouts](/x/payouts) to a Contact, they receive the amount in their Fund Account. Fund Accounts can be of [four types](/x/fund-accounts#fund-account-types), and a Contact can have multiple Fund Accounts.  
+ 
+
+You must [create a Contact](/api/x/contacts/create) to create a Fund Account. We recommend you to create Contacts and Fund Accounts beforehand to improve the [payout processing time](/x/payouts/status-details). When making payouts, ensure to [allowlist IPs](/x/dashboard/allowlist-ip), else the request will fail. 
+ 
+
+Fork the Razorpay Postman Public Workspace and try the Fund Accounts APIs using your [Test API Keys](/x/dashboard/api-keys).
+
+[](https://www.postman.com/razorpaydev/workspace/razorpay-public-workspace/folder/12492020-47aa8c0b-d897-48d2-aa5a-5d5c10c5c2b1)
+
+### Related Guides
+
+[About Fund Accounts](/x/fund-accounts)
+[Set Up Webhooks](/webhooks/setup-edit-payouts)
+[Webhook Payloads](/webhooks/account-validation)
+
+### Endpoints
+
+- **post** `/v1/fund_accounts` - Create Bank Account type Fund Account: 
+Creates a new Fund Account using bank account details.
+
+- **post** `/v1/fund_accounts` - Create VPA type Fund Account: 
+Creates a new Fund Account using VPA details.
+
+- **get** `/v1/fund_accounts` - Fetch All Fund Account: 
+Retrieves all the Fund Accounts.
+
+- **get** `/v1/fund_accounts/:id` - Fetch a Fund Account with ID: 
+Retrieves a single Fund Account with ID.
+
+- **patch** `/v1/fund_accounts/:id` - Activate/Deactivate a Fund Account: 
+Activates or deactivates an existing Fund Account.

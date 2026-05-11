@@ -1,0 +1,1968 @@
+openapi: 3.0.3
+info:
+  title: Razorpay Payment Gateway API
+  description: |
+    Razorpay Payment Gateway REST API for payments, orders, refunds, customers, subscriptions, invoices, and payment links.
+
+    ## Authentication
+    Razorpay uses HTTP Basic Auth. Use your `key_id` as username and `key_secret` as password.
+
+    ## Base URL
+    All API requests should be made to: `https://api.razorpay.com/v1`
+
+    ## Rate Limiting
+    Razorpay uses request rate limiting. Watch for HTTP 429 status codes and implement retry logic.
+  version: 1.0.0
+  contact:
+    name: Razorpay Support
+    url: https://razorpay.com/support/
+  license:
+    name: Razorpay Terms of Use
+    url: https://razorpay.com/terms/
+
+servers:
+  - url: https://api.razorpay.com/v1
+    description: Razorpay Production API
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: Orders
+    description: Create and manage orders
+  - name: Payments
+    description: Capture and fetch payments
+  - name: Refunds
+    description: Create and manage refunds
+  - name: Customers
+    description: Create and manage customers
+  - name: Invoices
+    description: Create and manage invoices
+  - name: Subscriptions
+    description: Create and manage subscriptions
+  - name: Plans
+    description: Create and manage subscription plans
+  - name: Payment Links
+    description: Create and manage payment links
+
+paths:
+  /orders:
+    post:
+      tags:
+        - Orders
+      summary: Create an order
+      description: |
+        Creates an order with basic details such as amount and currency.
+        Order creation is important as it associates every payment with an order,
+        preventing multiple payments and enabling automatic capture.
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+            example:
+              amount: 50000
+              currency: INR
+              receipt: receipt#1
+              notes:
+                key1: value1
+                key2: value2
+      responses:
+        '200':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    get:
+      tags:
+        - Orders
+      summary: Fetch all orders
+      description: Retrieves details of all orders. By default, returns the last 10 orders.
+      operationId: fetchAllOrders
+      parameters:
+        - $ref: '#/components/parameters/from'
+        - $ref: '#/components/parameters/to'
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/skip'
+        - name: authorized
+          in: query
+          description: Filter orders by authorization status (0 or 1)
+          schema:
+            type: integer
+            enum: [0, 1]
+        - name: receipt
+          in: query
+          description: Filter by receipt number
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /orders/{order_id}:
+    get:
+      tags:
+        - Orders
+      summary: Fetch an order by ID
+      description: Retrieves details of a specific order using its ID.
+      operationId: fetchOrder
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          description: Unique identifier of the order
+          schema:
+            type: string
+            example: order_DBJOWzybf0sJbb
+      responses:
+        '200':
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /orders/{order_id}/payments:
+    get:
+      tags:
+        - Orders
+      summary: Fetch payments for an order
+      description: Retrieves all payments associated with a specific order.
+      operationId: fetchOrderPayments
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          description: Unique identifier of the order
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of payments for the order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentList'
+
+  /payments:
+    get:
+      tags:
+        - Payments
+      summary: Fetch all payments
+      description: Retrieves details of all payments. By default, returns the last 10 payments.
+      operationId: fetchAllPayments
+      parameters:
+        - $ref: '#/components/parameters/from'
+        - $ref: '#/components/parameters/to'
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/skip'
+      responses:
+        '200':
+          description: List of payments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentList'
+
+  /payments/{payment_id}:
+    get:
+      tags:
+        - Payments
+      summary: Fetch a payment by ID
+      description: Retrieves details of a specific payment using its ID.
+      operationId: fetchPayment
+      parameters:
+        - name: payment_id
+          in: path
+          required: true
+          description: Unique identifier of the payment
+          schema:
+            type: string
+            example: pay_FgR9UMzgmKDJRi
+      responses:
+        '200':
+          description: Payment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /payments/{payment_id}/capture:
+    post:
+      tags:
+        - Payments
+      summary: Capture a payment
+      description: |
+        Changes the payment status from authorized to captured.
+        Attempting to capture a payment whose status is not authorized will produce an error.
+      operationId: capturePayment
+      parameters:
+        - name: payment_id
+          in: path
+          required: true
+          description: Unique identifier of the payment to capture
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CapturePaymentRequest'
+            example:
+              amount: 50000
+              currency: INR
+      responses:
+        '200':
+          description: Payment captured successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /payments/{payment_id}/card:
+    get:
+      tags:
+        - Payments
+      summary: Fetch card details of a payment
+      description: Retrieves card details used for a specific payment.
+      operationId: fetchPaymentCard
+      parameters:
+        - name: payment_id
+          in: path
+          required: true
+          description: Unique identifier of the payment
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Card details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
+
+  /payments/{payment_id}/refund:
+    post:
+      tags:
+        - Refunds
+      summary: Create a refund for a payment
+      description: |
+        Creates a refund for a captured payment. You can make full or partial refunds.
+        Only captured payments can be refunded.
+      operationId: createRefund
+      parameters:
+        - name: payment_id
+          in: path
+          required: true
+          description: Unique identifier of the payment to refund
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRefundRequest'
+            example:
+              amount: 50000
+              speed: normal
+              notes:
+                reason: Customer request
+              receipt: receipt#1
+      responses:
+        '200':
+          description: Refund created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /payments/{payment_id}/refunds:
+    get:
+      tags:
+        - Refunds
+      summary: Fetch refunds for a payment
+      description: Retrieves all refunds for a specific payment.
+      operationId: fetchPaymentRefunds
+      parameters:
+        - name: payment_id
+          in: path
+          required: true
+          description: Unique identifier of the payment
+          schema:
+            type: string
+        - $ref: '#/components/parameters/from'
+        - $ref: '#/components/parameters/to'
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/skip'
+      responses:
+        '200':
+          description: List of refunds
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefundList'
+
+  /payments/{payment_id}/refunds/{refund_id}:
+    get:
+      tags:
+        - Refunds
+      summary: Fetch a specific refund for a payment
+      description: Retrieves details of a specific refund for a payment.
+      operationId: fetchPaymentRefund
+      parameters:
+        - name: payment_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: refund_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Refund details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+
+  /refunds:
+    get:
+      tags:
+        - Refunds
+      summary: Fetch all refunds
+      description: Retrieves details of all refunds. By default, returns the last 10 refunds.
+      operationId: fetchAllRefunds
+      parameters:
+        - $ref: '#/components/parameters/from'
+        - $ref: '#/components/parameters/to'
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/skip'
+      responses:
+        '200':
+          description: List of refunds
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefundList'
+
+  /refunds/{refund_id}:
+    get:
+      tags:
+        - Refunds
+      summary: Fetch a refund by ID
+      description: Retrieves details of a specific refund using its ID.
+      operationId: fetchRefund
+      parameters:
+        - name: refund_id
+          in: path
+          required: true
+          description: Unique identifier of the refund
+          schema:
+            type: string
+            example: rfnd_FgRAHdNOM4ZVbO
+      responses:
+        '200':
+          description: Refund details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+
+  /customers:
+    post:
+      tags:
+        - Customers
+      summary: Create a customer
+      description: Creates a customer with basic details such as name and contact information.
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerRequest'
+            example:
+              name: John Doe
+              email: john.doe@example.com
+              contact: "+919876543210"
+              fail_existing: "0"
+              notes:
+                internal_id: cust_123
+      responses:
+        '200':
+          description: Customer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+    get:
+      tags:
+        - Customers
+      summary: Fetch all customers
+      description: Retrieves details of all customers. By default, returns the last 10 customers.
+      operationId: fetchAllCustomers
+      parameters:
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/skip'
+      responses:
+        '200':
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerList'
+
+  /customers/{customer_id}:
+    get:
+      tags:
+        - Customers
+      summary: Fetch a customer by ID
+      description: Retrieves details of a specific customer using their ID.
+      operationId: fetchCustomer
+      parameters:
+        - name: customer_id
+          in: path
+          required: true
+          description: Unique identifier of the customer
+          schema:
+            type: string
+            example: cust_1Aa00000000004
+      responses:
+        '200':
+          description: Customer details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+
+    put:
+      tags:
+        - Customers
+      summary: Update a customer
+      description: Updates an existing customer's details.
+      operationId: updateCustomer
+      parameters:
+        - name: customer_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerRequest'
+      responses:
+        '200':
+          description: Customer updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+
+  /invoices:
+    post:
+      tags:
+        - Invoices
+      summary: Create an invoice
+      description: |
+        Creates an invoice with customer details or customer ID.
+        Note: GST compliant invoices cannot be created via API.
+      operationId: createInvoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvoiceRequest'
+            example:
+              type: invoice
+              customer_id: cust_1Aa00000000004
+              line_items:
+                - name: Product A
+                  amount: 50000
+                  currency: INR
+                  quantity: 1
+              expire_by: 1893456000
+              sms_notify: true
+              email_notify: true
+              partial_payment: false
+      responses:
+        '200':
+          description: Invoice created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+
+    get:
+      tags:
+        - Invoices
+      summary: Fetch all invoices
+      description: Retrieves details of all invoices.
+      operationId: fetchAllInvoices
+      parameters:
+        - $ref: '#/components/parameters/from'
+        - $ref: '#/components/parameters/to'
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/skip'
+        - name: type
+          in: query
+          description: Filter by invoice type
+          schema:
+            type: string
+            enum: [invoice, link]
+        - name: payment_id
+          in: query
+          description: Filter by payment ID
+          schema:
+            type: string
+        - name: customer_id
+          in: query
+          description: Filter by customer ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of invoices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceList'
+
+  /invoices/{invoice_id}:
+    get:
+      tags:
+        - Invoices
+      summary: Fetch an invoice by ID
+      description: Retrieves details of a specific invoice.
+      operationId: fetchInvoice
+      parameters:
+        - name: invoice_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invoice details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+
+    patch:
+      tags:
+        - Invoices
+      summary: Update an invoice
+      description: Updates an existing draft invoice.
+      operationId: updateInvoice
+      parameters:
+        - name: invoice_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInvoiceRequest'
+      responses:
+        '200':
+          description: Invoice updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+
+  /invoices/{invoice_id}/cancel:
+    post:
+      tags:
+        - Invoices
+      summary: Cancel an invoice
+      description: Cancels an issued invoice.
+      operationId: cancelInvoice
+      parameters:
+        - name: invoice_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invoice cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+
+  /plans:
+    post:
+      tags:
+        - Plans
+      summary: Create a plan
+      description: Creates a subscription plan with item details.
+      operationId: createPlan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePlanRequest'
+            example:
+              period: monthly
+              interval: 1
+              item:
+                name: Premium Plan
+                amount: 99900
+                currency: INR
+                description: Monthly premium subscription
+      responses:
+        '200':
+          description: Plan created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+
+    get:
+      tags:
+        - Plans
+      summary: Fetch all plans
+      description: Retrieves details of all plans.
+      operationId: fetchAllPlans
+      parameters:
+        - $ref: '#/components/parameters/from'
+        - $ref: '#/components/parameters/to'
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/skip'
+      responses:
+        '200':
+          description: List of plans
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanList'
+
+  /plans/{plan_id}:
+    get:
+      tags:
+        - Plans
+      summary: Fetch a plan by ID
+      description: Retrieves details of a specific plan.
+      operationId: fetchPlan
+      parameters:
+        - name: plan_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: plan_00000000000001
+      responses:
+        '200':
+          description: Plan details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+
+  /subscriptions:
+    post:
+      tags:
+        - Subscriptions
+      summary: Create a subscription
+      description: Creates a subscription linked to a plan.
+      operationId: createSubscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSubscriptionRequest'
+            example:
+              plan_id: plan_00000000000001
+              total_count: 12
+              quantity: 1
+              customer_notify: 1
+              notes:
+                key1: value1
+      responses:
+        '200':
+          description: Subscription created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+
+    get:
+      tags:
+        - Subscriptions
+      summary: Fetch all subscriptions
+      description: Retrieves details of all subscriptions.
+      operationId: fetchAllSubscriptions
+      parameters:
+        - $ref: '#/components/parameters/from'
+        - $ref: '#/components/parameters/to'
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/skip'
+        - name: plan_id
+          in: query
+          description: Filter by plan ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of subscriptions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionList'
+
+  /subscriptions/{subscription_id}:
+    get:
+      tags:
+        - Subscriptions
+      summary: Fetch a subscription by ID
+      description: Retrieves details of a specific subscription.
+      operationId: fetchSubscription
+      parameters:
+        - name: subscription_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: sub_00000000000001
+      responses:
+        '200':
+          description: Subscription details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+
+    patch:
+      tags:
+        - Subscriptions
+      summary: Update a subscription
+      description: Updates an existing subscription.
+      operationId: updateSubscription
+      parameters:
+        - name: subscription_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSubscriptionRequest'
+      responses:
+        '200':
+          description: Subscription updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+
+  /subscriptions/{subscription_id}/cancel:
+    post:
+      tags:
+        - Subscriptions
+      summary: Cancel a subscription
+      description: Cancels an active subscription.
+      operationId: cancelSubscription
+      parameters:
+        - name: subscription_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cancel_at_cycle_end
+          in: query
+          description: If true, cancels at the end of current billing cycle
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Subscription cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+
+  /payment_links:
+    post:
+      tags:
+        - Payment Links
+      summary: Create a payment link
+      description: Creates a payment link that can be shared with customers.
+      operationId: createPaymentLink
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentLinkRequest'
+            example:
+              amount: 50000
+              currency: INR
+              accept_partial: false
+              description: Payment for Order #123
+              reference_id: order_123
+              expire_by: 1893456000
+              notify:
+                sms: true
+                email: true
+              callback_url: https://example.com/callback
+              callback_method: get
+      responses:
+        '200':
+          description: Payment link created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentLink'
+
+    get:
+      tags:
+        - Payment Links
+      summary: Fetch all payment links
+      description: Retrieves details of all payment links.
+      operationId: fetchAllPaymentLinks
+      parameters:
+        - $ref: '#/components/parameters/from'
+        - $ref: '#/components/parameters/to'
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/skip'
+        - name: payment_id
+          in: query
+          description: Filter by payment ID
+          schema:
+            type: string
+        - name: reference_id
+          in: query
+          description: Filter by reference ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of payment links
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentLinkList'
+
+  /payment_links/{payment_link_id}:
+    get:
+      tags:
+        - Payment Links
+      summary: Fetch a payment link by ID
+      description: Retrieves details of a specific payment link.
+      operationId: fetchPaymentLink
+      parameters:
+        - name: payment_link_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: plink_FKeEiabyAAiSVQ
+      responses:
+        '200':
+          description: Payment link details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentLink'
+
+    patch:
+      tags:
+        - Payment Links
+      summary: Update a payment link
+      description: Updates an existing payment link.
+      operationId: updatePaymentLink
+      parameters:
+        - name: payment_link_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentLinkRequest'
+      responses:
+        '200':
+          description: Payment link updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentLink'
+
+  /payment_links/{payment_link_id}/cancel:
+    post:
+      tags:
+        - Payment Links
+      summary: Cancel a payment link
+      description: Cancels an existing payment link.
+      operationId: cancelPaymentLink
+      parameters:
+        - name: payment_link_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payment link cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentLink'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Use your key_id as username and key_secret as password
+
+  parameters:
+    from:
+      name: from
+      in: query
+      description: Unix timestamp to filter from
+      schema:
+        type: integer
+    to:
+      name: to
+      in: query
+      description: Unix timestamp to filter to
+      schema:
+        type: integer
+    count:
+      name: count
+      in: query
+      description: Number of records to fetch (max 100)
+      schema:
+        type: integer
+        default: 10
+        maximum: 100
+    skip:
+      name: skip
+      in: query
+      description: Number of records to skip for pagination
+      schema:
+        type: integer
+        default: 0
+
+  responses:
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Authentication failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Notes:
+      type: object
+      description: Key-value pairs for storing additional information (max 15 pairs, 256 chars each)
+      additionalProperties:
+        type: string
+        maxLength: 256
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: BAD_REQUEST_ERROR
+            description:
+              type: string
+              example: The amount field is required
+            source:
+              type: string
+              example: business
+            step:
+              type: string
+            reason:
+              type: string
+            metadata:
+              type: object
+
+    CreateOrderRequest:
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: integer
+          description: Amount in smallest currency unit (e.g., paise for INR). Minimum 100.
+          minimum: 100
+          example: 50000
+        currency:
+          type: string
+          description: ISO currency code
+          minLength: 3
+          maxLength: 3
+          example: INR
+        receipt:
+          type: string
+          description: Unique receipt number for internal reference
+          maxLength: 40
+        notes:
+          $ref: '#/components/schemas/Notes'
+        partial_payment:
+          type: boolean
+          description: Allow partial payments
+          default: false
+        first_payment_min_amount:
+          type: integer
+          description: Minimum first partial payment amount (required if partial_payment is true)
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique order identifier
+          example: order_DBJOWzybf0sJbb
+        entity:
+          type: string
+          enum: [order]
+        amount:
+          type: integer
+          description: Order amount in smallest currency unit
+        amount_paid:
+          type: integer
+          description: Amount paid so far
+        amount_due:
+          type: integer
+          description: Amount remaining to be paid
+        currency:
+          type: string
+        receipt:
+          type: string
+        offer_id:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [created, attempted, paid]
+          description: |
+            - created: Order created, no payment attempted
+            - attempted: Payment attempted but not captured
+            - paid: Payment captured successfully
+        attempts:
+          type: integer
+          description: Number of payment attempts
+        notes:
+          $ref: '#/components/schemas/Notes'
+        created_at:
+          type: integer
+          description: Unix timestamp of creation
+
+    OrderList:
+      type: object
+      properties:
+        entity:
+          type: string
+          enum: [collection]
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+
+    CapturePaymentRequest:
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: integer
+          description: Amount to capture (should equal order amount)
+        currency:
+          type: string
+          description: ISO currency code
+
+    Payment:
+      type: object
+      properties:
+        id:
+          type: string
+          example: pay_FgR9UMzgmKDJRi
+        entity:
+          type: string
+          enum: [payment]
+        amount:
+          type: integer
+        currency:
+          type: string
+        status:
+          type: string
+          enum: [created, authorized, captured, refunded, failed]
+        order_id:
+          type: string
+        invoice_id:
+          type: string
+          nullable: true
+        international:
+          type: boolean
+        method:
+          type: string
+          enum: [card, netbanking, wallet, emi, upi, bank_transfer]
+        amount_refunded:
+          type: integer
+        refund_status:
+          type: string
+          enum: [null, partial, full]
+          nullable: true
+        captured:
+          type: boolean
+        description:
+          type: string
+          nullable: true
+        card_id:
+          type: string
+          nullable: true
+        bank:
+          type: string
+          nullable: true
+        wallet:
+          type: string
+          nullable: true
+        vpa:
+          type: string
+          nullable: true
+        email:
+          type: string
+        contact:
+          type: string
+        fee:
+          type: integer
+          description: Fee charged by Razorpay (including GST)
+        tax:
+          type: integer
+          description: GST charged
+        notes:
+          $ref: '#/components/schemas/Notes'
+        error_code:
+          type: string
+          nullable: true
+        error_description:
+          type: string
+          nullable: true
+        error_source:
+          type: string
+          nullable: true
+        error_step:
+          type: string
+          nullable: true
+        error_reason:
+          type: string
+          nullable: true
+        acquirer_data:
+          type: object
+          properties:
+            bank_transaction_id:
+              type: string
+            rrn:
+              type: string
+            auth_code:
+              type: string
+        created_at:
+          type: integer
+
+    PaymentList:
+      type: object
+      properties:
+        entity:
+          type: string
+          enum: [collection]
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+
+    Card:
+      type: object
+      properties:
+        id:
+          type: string
+        entity:
+          type: string
+          enum: [card]
+        name:
+          type: string
+        last4:
+          type: string
+        network:
+          type: string
+          enum: [Visa, MasterCard, RuPay, American Express, Diners Club, Maestro]
+        type:
+          type: string
+          enum: [credit, debit, prepaid]
+        issuer:
+          type: string
+          nullable: true
+        international:
+          type: boolean
+        emi:
+          type: boolean
+        sub_type:
+          type: string
+
+    CreateRefundRequest:
+      type: object
+      properties:
+        amount:
+          type: integer
+          description: Amount to refund (omit for full refund)
+        speed:
+          type: string
+          enum: [normal, optimum]
+          description: |
+            - normal: 5-7 working days
+            - optimum: Instant refund if possible
+          default: normal
+        notes:
+          $ref: '#/components/schemas/Notes'
+        receipt:
+          type: string
+          description: Unique identifier for internal reference
+
+    Refund:
+      type: object
+      properties:
+        id:
+          type: string
+          example: rfnd_FgRAHdNOM4ZVbO
+        entity:
+          type: string
+          enum: [refund]
+        amount:
+          type: integer
+        currency:
+          type: string
+        payment_id:
+          type: string
+        notes:
+          $ref: '#/components/schemas/Notes'
+        receipt:
+          type: string
+          nullable: true
+        acquirer_data:
+          type: object
+          properties:
+            rrn:
+              type: string
+            arn:
+              type: string
+        created_at:
+          type: integer
+        batch_id:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [pending, processed, failed]
+        speed_requested:
+          type: string
+          enum: [normal, optimum]
+        speed_processed:
+          type: string
+          enum: [normal, instant]
+
+    RefundList:
+      type: object
+      properties:
+        entity:
+          type: string
+          enum: [collection]
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Refund'
+
+    CreateCustomerRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Customer name (3-50 characters)
+          minLength: 3
+          maxLength: 50
+        email:
+          type: string
+          format: email
+          maxLength: 64
+        contact:
+          type: string
+          description: Phone number with country code
+          maxLength: 15
+        fail_existing:
+          type: string
+          enum: ["0", "1"]
+          description: |
+            - 1 (default): Error if customer exists
+            - 0: Return existing customer if found
+          default: "1"
+        gstin:
+          type: string
+          description: Customer's GST number
+        notes:
+          $ref: '#/components/schemas/Notes'
+
+    UpdateCustomerRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 50
+        email:
+          type: string
+          format: email
+        contact:
+          type: string
+        gstin:
+          type: string
+        notes:
+          $ref: '#/components/schemas/Notes'
+
+    Customer:
+      type: object
+      properties:
+        id:
+          type: string
+          example: cust_1Aa00000000004
+        entity:
+          type: string
+          enum: [customer]
+        name:
+          type: string
+        email:
+          type: string
+        contact:
+          type: string
+        gstin:
+          type: string
+          nullable: true
+        notes:
+          $ref: '#/components/schemas/Notes'
+        created_at:
+          type: integer
+
+    CustomerList:
+      type: object
+      properties:
+        entity:
+          type: string
+          enum: [collection]
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Customer'
+
+    LineItem:
+      type: object
+      required:
+        - name
+        - amount
+      properties:
+        name:
+          type: string
+          description: Item name
+        description:
+          type: string
+        amount:
+          type: integer
+          description: Amount in smallest currency unit
+        currency:
+          type: string
+        quantity:
+          type: integer
+          default: 1
+
+    CreateInvoiceRequest:
+      type: object
+      required:
+        - type
+        - line_items
+      properties:
+        type:
+          type: string
+          enum: [invoice]
+        customer_id:
+          type: string
+          description: Existing customer ID
+        customer:
+          type: object
+          description: Customer details (if not using customer_id)
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+            contact:
+              type: string
+            billing_address:
+              type: object
+            shipping_address:
+              type: object
+        line_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineItem'
+          maxItems: 50
+        expire_by:
+          type: integer
+          description: Unix timestamp for expiry
+        sms_notify:
+          type: boolean
+          default: true
+        email_notify:
+          type: boolean
+          default: true
+        partial_payment:
+          type: boolean
+          default: false
+        currency:
+          type: string
+        description:
+          type: string
+          maxLength: 2048
+        notes:
+          $ref: '#/components/schemas/Notes'
+        receipt:
+          type: string
+          maxLength: 40
+        draft:
+          type: string
+          enum: ["0", "1"]
+          description: Create as draft if "1"
+
+    UpdateInvoiceRequest:
+      type: object
+      properties:
+        line_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineItem'
+        expire_by:
+          type: integer
+        description:
+          type: string
+        notes:
+          $ref: '#/components/schemas/Notes'
+
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: string
+        entity:
+          type: string
+          enum: [invoice]
+        type:
+          type: string
+        order_id:
+          type: string
+        payment_id:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [draft, issued, partially_paid, paid, cancelled, expired]
+        short_url:
+          type: string
+          description: Shareable payment URL
+        amount:
+          type: integer
+        amount_paid:
+          type: integer
+        amount_due:
+          type: integer
+        currency:
+          type: string
+        customer_id:
+          type: string
+        customer_details:
+          type: object
+        line_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineItem'
+        description:
+          type: string
+        notes:
+          $ref: '#/components/schemas/Notes'
+        receipt:
+          type: string
+        sms_status:
+          type: string
+        email_status:
+          type: string
+        expire_by:
+          type: integer
+        issued_at:
+          type: integer
+        paid_at:
+          type: integer
+          nullable: true
+        cancelled_at:
+          type: integer
+          nullable: true
+        expired_at:
+          type: integer
+          nullable: true
+        created_at:
+          type: integer
+
+    InvoiceList:
+      type: object
+      properties:
+        entity:
+          type: string
+          enum: [collection]
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Invoice'
+
+    CreatePlanRequest:
+      type: object
+      required:
+        - period
+        - interval
+        - item
+      properties:
+        period:
+          type: string
+          enum: [daily, weekly, monthly, yearly]
+        interval:
+          type: integer
+          description: Billing frequency (e.g., 1 for every month, 3 for quarterly)
+          minimum: 1
+        item:
+          type: object
+          required:
+            - name
+            - amount
+            - currency
+          properties:
+            name:
+              type: string
+            amount:
+              type: integer
+            currency:
+              type: string
+            description:
+              type: string
+        notes:
+          $ref: '#/components/schemas/Notes'
+
+    Plan:
+      type: object
+      properties:
+        id:
+          type: string
+          example: plan_00000000000001
+        entity:
+          type: string
+          enum: [plan]
+        interval:
+          type: integer
+        period:
+          type: string
+        item:
+          type: object
+          properties:
+            id:
+              type: string
+            active:
+              type: boolean
+            amount:
+              type: integer
+            unit_amount:
+              type: integer
+            currency:
+              type: string
+            name:
+              type: string
+            description:
+              type: string
+            type:
+              type: string
+            unit:
+              type: string
+        notes:
+          $ref: '#/components/schemas/Notes'
+        created_at:
+          type: integer
+
+    PlanList:
+      type: object
+      properties:
+        entity:
+          type: string
+          enum: [collection]
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plan'
+
+    Addon:
+      type: object
+      properties:
+        item:
+          type: object
+          required:
+            - name
+            - amount
+            - currency
+          properties:
+            name:
+              type: string
+            amount:
+              type: integer
+            currency:
+              type: string
+
+    CreateSubscriptionRequest:
+      type: object
+      required:
+        - plan_id
+        - total_count
+      properties:
+        plan_id:
+          type: string
+          description: ID of the plan to subscribe to
+        total_count:
+          type: integer
+          description: Number of billing cycles
+          minimum: 1
+        quantity:
+          type: integer
+          description: Number of units per billing cycle
+          default: 1
+        customer_notify:
+          type: integer
+          enum: [0, 1]
+          description: Whether Razorpay notifies the customer
+          default: 1
+        start_at:
+          type: integer
+          description: Unix timestamp to start subscription
+        expire_by:
+          type: integer
+          description: Unix timestamp for authorization payment deadline
+        offer_id:
+          type: string
+        addons:
+          type: array
+          items:
+            $ref: '#/components/schemas/Addon'
+        notes:
+          $ref: '#/components/schemas/Notes'
+
+    UpdateSubscriptionRequest:
+      type: object
+      properties:
+        plan_id:
+          type: string
+        quantity:
+          type: integer
+        remaining_count:
+          type: integer
+        start_at:
+          type: integer
+        schedule_change_at:
+          type: string
+          enum: [now, cycle_end]
+        offer_id:
+          type: string
+        customer_notify:
+          type: integer
+          enum: [0, 1]
+
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: string
+          example: sub_00000000000001
+        entity:
+          type: string
+          enum: [subscription]
+        plan_id:
+          type: string
+        customer_id:
+          type: string
+        status:
+          type: string
+          enum: [created, authenticated, active, pending, halted, cancelled, completed, expired]
+        current_start:
+          type: integer
+        current_end:
+          type: integer
+        ended_at:
+          type: integer
+          nullable: true
+        quantity:
+          type: integer
+        notes:
+          $ref: '#/components/schemas/Notes'
+        charge_at:
+          type: integer
+        offer_id:
+          type: string
+          nullable: true
+        short_url:
+          type: string
+          description: Authorization payment URL
+        has_scheduled_changes:
+          type: boolean
+        change_scheduled_at:
+          type: integer
+          nullable: true
+        source:
+          type: string
+        payment_method:
+          type: string
+        remaining_count:
+          type: integer
+        paid_count:
+          type: integer
+        total_count:
+          type: integer
+        created_at:
+          type: integer
+
+    SubscriptionList:
+      type: object
+      properties:
+        entity:
+          type: string
+          enum: [collection]
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subscription'
+
+    Notify:
+      type: object
+      properties:
+        sms:
+          type: boolean
+        email:
+          type: boolean
+
+    CreatePaymentLinkRequest:
+      type: object
+      required:
+        - amount
+      properties:
+        amount:
+          type: integer
+          description: Amount in smallest currency unit
+          minimum: 100
+        currency:
+          type: string
+          default: INR
+        accept_partial:
+          type: boolean
+          description: Allow partial payments
+          default: false
+        first_min_partial_amount:
+          type: integer
+          description: Minimum first partial payment
+        description:
+          type: string
+          maxLength: 2048
+        customer:
+          type: object
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+            contact:
+              type: string
+        notify:
+          $ref: '#/components/schemas/Notify'
+        reminder_enable:
+          type: boolean
+        reference_id:
+          type: string
+          maxLength: 40
+        expire_by:
+          type: integer
+          description: Unix timestamp (max 6 months from creation)
+        callback_url:
+          type: string
+          format: uri
+        callback_method:
+          type: string
+          enum: [get]
+          description: Required if callback_url is provided
+        notes:
+          $ref: '#/components/schemas/Notes'
+
+    UpdatePaymentLinkRequest:
+      type: object
+      properties:
+        accept_partial:
+          type: boolean
+        reference_id:
+          type: string
+        expire_by:
+          type: integer
+        reminder_enable:
+          type: boolean
+        notes:
+          $ref: '#/components/schemas/Notes'
+
+    PaymentLink:
+      type: object
+      properties:
+        id:
+          type: string
+          example: plink_FKeEiabyAAiSVQ
+        entity:
+          type: string
+          enum: [payment_link]
+        amount:
+          type: integer
+        currency:
+          type: string
+        accept_partial:
+          type: boolean
+        first_min_partial_amount:
+          type: integer
+        description:
+          type: string
+        customer_id:
+          type: string
+          nullable: true
+        customer:
+          type: object
+        notify:
+          $ref: '#/components/schemas/Notify'
+        reminder_enable:
+          type: boolean
+        notes:
+          $ref: '#/components/schemas/Notes'
+        reference_id:
+          type: string
+        short_url:
+          type: string
+          description: Shareable payment URL
+        status:
+          type: string
+          enum: [created, partially_paid, paid, cancelled, expired]
+        amount_paid:
+          type: integer
+        cancelled_at:
+          type: integer
+          nullable: true
+        expired_at:
+          type: integer
+          nullable: true
+        expire_by:
+          type: integer
+        callback_url:
+          type: string
+        callback_method:
+          type: string
+        created_at:
+          type: integer
+        updated_at:
+          type: integer
+        payments:
+          type: array
+          items:
+            type: object
+          nullable: true
+
+    PaymentLinkList:
+      type: object
+      properties:
+        entity:
+          type: string
+          enum: [collection]
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentLink'

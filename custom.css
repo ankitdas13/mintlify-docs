@@ -1,0 +1,35 @@
+/* Hide default Mintlify chrome on the landing page only */
+html[data-current-path="/"] #sidebar,
+html[data-current-path="/"] #navbar,
+html[data-current-path="/"] .nav-tabs,
+html[data-current-path="/"] div:has(> .nav-tabs) {
+  display: none !important;
+}
+
+html[data-current-path="/"] #content-container {
+  margin-left: 0 !important;
+  padding-top: 0 !important;
+  gap: 0 !important;
+  min-height: 0 !important;
+}
+
+html[data-current-path="/"] #content-area {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin-top: 0 !important;
+  padding: 0 !important;
+}
+
+html[data-current-path="/"] #content {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Hide the table of contents on the landing page */
+html[data-current-path="/"] #table-of-contents,
+html[data-current-path="/"] aside:has(> #table-of-contents) {
+  display: none !important;
+}

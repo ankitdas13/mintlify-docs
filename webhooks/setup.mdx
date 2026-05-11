@@ -1,0 +1,152 @@
+---
+title: 'Set up webhooks and verify signatures in Razorpay'
+description: 'Configure a webhook endpoint in the Razorpay Dashboard, verify request signatures using HMAC-SHA256, and follow best practices for reliable event handling.'
+---
+
+To start receiving webhook events from Razorpay, you register your server's endpoint URL in the Dashboard, select the events you care about, and set a secret used to verify that each incoming request genuinely came from Razorpay.
+
+## Register your endpoint
+
+<Steps>
+  <Step title="Open Webhook settings">
+    Log in to the [Razorpay Dashboard](https://dashboard.razorpay.com) and go to **Account & Settings → Webhooks**.
+  </Step>
+
+  <Step title="Add a new webhook">
+    Click **Add New Webhook**.
+  </Step>
+
+  <Step title="Enter your endpoint URL">
+    Provide the full URL where Razorpay should POST event payloads. The URL must be publicly reachable and use port **80** or **443**.
+
+    <Warning>
+      Localhost URLs (e.g., `http://localhost:3000`) are not supported. Use a publicly accessible URL. During development, tools like [ngrok](https://ngrok.com) can expose your local server.
+    </Warning>
+  </Step>
+
+  <Step title="Select events">
+    Choose the events you want to receive (for example, `payment.captured`, `refund.processed`). You can subscribe to multiple events per endpoint.
+  </Step>
+
+  <Step title="Set a webhook secret">
+    Enter a strong random string as your webhook secret. Razorpay uses this to sign each request. Store it securely — you will need it to verify signatures.
+  </Step>
+
+  <Step title="Save">
+    Click **Save**. Razorpay will send a test event to confirm that your endpoint is reachable.
+  </Step>
+</Steps>
+
+<Note>
+  Configure **separate endpoint URLs** for Test Mode and Live Mode. Test Mode webhooks only fire for test transactions, so your production endpoint will not receive noise from testing.
+</Note>
+
+## Endpoint requirements
+
+Your webhook endpoint must:
+
+- Be **publicly accessible** over the internet
+- Accept **HTTP POST** requests
+- Use **port 80 or 443** only
+- Respond with **HTTP 200** within 5 seconds
+- If your server restricts inbound traffic by IP, **whitelist Razorpay's IP addresses** — see the [Razorpay IP allowlist documentation](https://razorpay.com/docs/webhooks/ip-allowlist/) for the current list
+
+## Verifying webhook signatures
+
+Every request Razorpay sends includes an `X-Razorpay-Signature` header. You must validate this header before trusting or processing the payload. Razorpay generates the signature by computing an HMAC-SHA256 hash of the raw request body using your webhook secret.
+
+<Warning>
+  Always verify the signature before processing any webhook payload. Skipping this step leaves your endpoint open to spoofed requests.
+</Warning>
+
+<CodeGroup>
+
+```javascript Node.js (Express)
+const crypto = require('crypto');
+
+function verifyWebhookSignature(body, signature, secret) {
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(body) // raw request body as a string
+    .digest('hex');
+  return expectedSignature === signature;
+}
+
+// Use express.raw() so req.body is a Buffer, not a parsed object
+app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  const signature = req.headers['x-razorpay-signature'];
+
+  const isValid = verifyWebhookSignature(
+    req.body.toString(),
+    signature,
+    'YOUR_WEBHOOK_SECRET'
+  );
+
+  if (!isValid) {
+    return res.status(400).send('Invalid signature');
+  }
+
+  const event = JSON.parse(req.body);
+  // Acknowledge immediately, then process asynchronously
+  res.status(200).send('OK');
+  handleEvent(event);
+});
+```
+
+```python Python
+import hmac
+import hashlib
+
+def verify_webhook_signature(body: bytes, signature: str, secret: str) -> bool:
+    expected = hmac.new(
+        secret.encode('utf-8'),
+        body,
+        hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature)
+
+# Flask example
+from flask import Flask, request, abort
+import json
+
+app = Flask(__name__)
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    signature = request.headers.get('X-Razorpay-Signature', '')
+    raw_body = request.get_data()
+
+    if not verify_webhook_signature(raw_body, signature, 'YOUR_WEBHOOK_SECRET'):
+        abort(400, 'Invalid signature')
+
+    event = json.loads(raw_body)
+    # Acknowledge immediately
+    return 'OK', 200
+```
+
+</CodeGroup>
+
+<Tip>
+  Use the **raw** request body for signature verification — not a re-serialized version of the parsed JSON. Parsers may reorder keys or strip whitespace, producing a different hash.
+</Tip>
+
+## Retry behavior
+
+If your endpoint returns a non-200 status code or does not respond within 5 seconds, Razorpay marks the delivery as failed and retries automatically.
+
+| Attempt | Approx. delay after previous attempt |
+|---|---|
+| 1 | Immediate |
+| 2 | ~5 minutes |
+| 3 | ~30 minutes |
+| 4–8 | Increasing intervals, up to 24 hours |
+
+After 8 failed attempts, no further retries are made. You can view delivery attempts and manually trigger a retry from the Razorpay Dashboard under **Account & Settings → Webhooks**.
+
+## Best practices
+
+- **Verify the signature on every request** — do not skip this for internal or test events.
+- **Respond with 200 immediately**, then process the event asynchronously (for example, enqueue it for a background worker).
+- **Make your handler idempotent** using the `id` field in the payload. If the same event is delivered twice, processing it a second time should have no side effects.
+- **Log the raw request body** before parsing so you have a record for debugging, even if deserialization fails.
+- **Use the `event` field** (e.g., `payment.captured`) to route each payload to the correct handler rather than inferring event type from payload structure.

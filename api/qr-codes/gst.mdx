@@ -1,0 +1,32 @@
+---
+title: "QR Codes GST APIs"
+description: "You can use Razorpay QR Codes to create QR Codes and share them with customers to accept digital payments."
+---
+
+## How it Works 
+
+Given below is the flow:
+1. You create a QR Code.
+1. A short URL is generated. 
+1. Share the URL with your customers.
+1. Customers scan the QR Code with their preferred UPI PSP app and complete the payment.
+
+## List of Endpoints
+
+API Endpoint | Description
+---
+[Create a QR Code](/api/qr-codes/gst/create) | Creates a QR Code.
+---
+[Close a QR Code](/api/qr-codes/gst/close) | Closes a QR Code.
+---
+[Fetch all QR Codes](/api/qr-codes/gst/fetch-all) | Retrieves details of all QR Codes.
+---
+[Fetch a QR Code with Id](/api/qr-codes/gst/fetch-with-id) | Retrieves details of a specific QR Code using id.
+---
+[Fetch QR Codes for a Customer ID](/api/qr-codes/gst/fetch-customer-id) | Retrieves QR Codes generated for a Customer id.
+---
+[Fetch QR Codes for a Payment ID](/api/qr-codes/gst/fetch-payment-id) | Retrieves QR Codes by Payment id.
+---
+[Fetch Payments for a QR Code](/api/qr-codes/gst/fetch-payments) | Retrieves payments made on a QR Code.
+---
+[Refund Payments](/api/qr-codes/gst/refunds) | Refunds payments made on a QR Code.

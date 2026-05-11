@@ -1,0 +1,1548 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Razorpay Products API",
+    "description": "API specification for Razorpay Payment Links and Subscriptions products.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Razorpay Support",
+      "url": "https://razorpay.com/support"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.razorpay.com/v1",
+      "description": "Razorpay Production API"
+    }
+  ],
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Use your Razorpay Key ID as the username and Key Secret as the password."
+      }
+    },
+    "schemas": {
+      "CustomerObject": {
+        "type": "object",
+        "description": "Customer contact details.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the customer.",
+            "example": "Gaurav Kumar"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email address of the customer.",
+            "example": "gaurav.kumar@example.com"
+          },
+          "contact": {
+            "type": "string",
+            "description": "Phone number of the customer, including country code.",
+            "example": "+919900000000"
+          }
+        }
+      },
+      "NotifyObject": {
+        "type": "object",
+        "description": "Notification channels for sending the payment link to the customer.",
+        "properties": {
+          "sms": {
+            "type": "boolean",
+            "description": "Send the payment link via SMS to the customer.",
+            "example": true
+          },
+          "email": {
+            "type": "boolean",
+            "description": "Send the payment link via email to the customer.",
+            "example": true
+          }
+        }
+      },
+      "PaymentLink": {
+        "type": "object",
+        "description": "A Razorpay Payment Link object.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier of the payment link.",
+            "example": "plink_ERgihyaAAC0VNW"
+          },
+          "entity": {
+            "type": "string",
+            "description": "Entity type. Always `payment_link`.",
+            "example": "payment_link"
+          },
+          "accept_partial": {
+            "type": "boolean",
+            "description": "Indicates whether the customer can make a partial payment.",
+            "example": false
+          },
+          "amount": {
+            "type": "integer",
+            "description": "Payment link amount in the smallest currency unit (e.g., paise for INR).",
+            "example": 50000
+          },
+          "amount_paid": {
+            "type": "integer",
+            "description": "Amount paid against the payment link so far.",
+            "example": 0
+          },
+          "cancelled_at": {
+            "type": "integer",
+            "description": "Unix timestamp at which the payment link was cancelled. `null` if not cancelled.",
+            "example": null,
+            "nullable": true
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp at which the payment link was created.",
+            "example": 1591097057
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code.",
+            "example": "INR"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/CustomerObject"
+          },
+          "description": {
+            "type": "string",
+            "description": "A brief description shown to the customer on the payment page.",
+            "example": "Payment for policy no #23456"
+          },
+          "expire_by": {
+            "type": "integer",
+            "description": "Unix timestamp after which the payment link will expire.",
+            "example": 1691097057,
+            "nullable": true
+          },
+          "expired_at": {
+            "type": "integer",
+            "description": "Unix timestamp at which the payment link expired.",
+            "example": null,
+            "nullable": true
+          },
+          "reference_id": {
+            "type": "string",
+            "description": "An optional reference identifier you can set for internal use.",
+            "example": "TS1989",
+            "nullable": true
+          },
+          "reminder_enable": {
+            "type": "boolean",
+            "description": "Indicates whether payment reminders are enabled for the link.",
+            "example": true
+          },
+          "short_url": {
+            "type": "string",
+            "description": "Short URL of the payment link that is shared with customers.",
+            "example": "https://rzp.io/i/nxrHnLJ"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current status of the payment link.",
+            "enum": ["created", "partially_paid", "paid", "cancelled", "expired"],
+            "example": "created"
+          },
+          "updated_at": {
+            "type": "integer",
+            "description": "Unix timestamp at which the payment link was last updated.",
+            "example": 1591097057
+          },
+          "user_id": {
+            "type": "string",
+            "description": "Unique identifier of the Razorpay user who created the payment link.",
+            "example": ""
+          }
+        }
+      },
+      "CreatePaymentLinkRequest": {
+        "type": "object",
+        "required": ["amount", "currency"],
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "description": "Payment link amount in the smallest currency unit (e.g., paise for INR). Must be greater than 0.",
+            "example": 50000
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code. Supported values include `INR`.",
+            "example": "INR"
+          },
+          "description": {
+            "type": "string",
+            "description": "A brief description of the payment link shown to the customer on the payment page.",
+            "example": "Payment for policy no #23456"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/CustomerObject"
+          },
+          "notify": {
+            "$ref": "#/components/schemas/NotifyObject"
+          },
+          "reminder_enable": {
+            "type": "boolean",
+            "description": "Set to `true` to send payment reminders to the customer.",
+            "example": true
+          },
+          "expire_by": {
+            "type": "integer",
+            "description": "Unix timestamp after which the payment link will expire. Must be at least 15 minutes in the future.",
+            "example": 1691097057
+          },
+          "accept_partial": {
+            "type": "boolean",
+            "description": "Set to `true` to allow the customer to pay a partial amount.",
+            "example": false
+          },
+          "reference_id": {
+            "type": "string",
+            "description": "An optional reference identifier for internal use. Must be unique per payment link.",
+            "example": "TS1989"
+          }
+        }
+      },
+      "UpdatePaymentLinkRequest": {
+        "type": "object",
+        "properties": {
+          "expire_by": {
+            "type": "integer",
+            "description": "New Unix timestamp after which the payment link will expire.",
+            "example": 1791097057
+          },
+          "reminder_enable": {
+            "type": "boolean",
+            "description": "Enable or disable payment reminders for the link.",
+            "example": false
+          }
+        }
+      },
+      "PlanItem": {
+        "type": "object",
+        "description": "Details of the item associated with the plan.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier of the item.",
+            "example": "item_00000000000001"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Indicates whether the item is active.",
+            "example": true
+          },
+          "amount": {
+            "type": "integer",
+            "description": "Amount to be charged per billing cycle, in the smallest currency unit.",
+            "example": 500
+          },
+          "unit_amount": {
+            "type": "integer",
+            "description": "Same as `amount`. Amount per unit.",
+            "example": 500
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code.",
+            "example": "INR"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the item.",
+            "example": "Test Weekly 1"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the item.",
+            "example": "Description for the weekly plan"
+          }
+        }
+      },
+      "Plan": {
+        "type": "object",
+        "description": "A Razorpay Plan object used to define recurring billing.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier of the plan.",
+            "example": "plan_00000000000001"
+          },
+          "entity": {
+            "type": "string",
+            "description": "Entity type. Always `plan`.",
+            "example": "plan"
+          },
+          "interval": {
+            "type": "integer",
+            "description": "Number of billing periods between charges. For example, `2` with `period=weekly` means every 2 weeks.",
+            "example": 1
+          },
+          "period": {
+            "type": "string",
+            "description": "Billing frequency.",
+            "enum": ["daily", "weekly", "monthly", "yearly"],
+            "example": "weekly"
+          },
+          "item": {
+            "$ref": "#/components/schemas/PlanItem"
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp at which the plan was created.",
+            "example": 1580453311
+          }
+        }
+      },
+      "CreatePlanItemRequest": {
+        "type": "object",
+        "required": ["name", "amount", "currency"],
+        "description": "Item details for the plan.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the item.",
+            "example": "Test Weekly 1"
+          },
+          "amount": {
+            "type": "integer",
+            "description": "Amount to be charged per billing cycle, in the smallest currency unit.",
+            "example": 500
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code.",
+            "example": "INR"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the item.",
+            "example": "Description for the weekly plan"
+          }
+        }
+      },
+      "CreatePlanRequest": {
+        "type": "object",
+        "required": ["period", "interval", "item"],
+        "properties": {
+          "period": {
+            "type": "string",
+            "description": "Billing frequency of the plan.",
+            "enum": ["daily", "weekly", "monthly", "yearly"],
+            "example": "weekly"
+          },
+          "interval": {
+            "type": "integer",
+            "description": "Number of billing period intervals between charges. For example, `2` with `period=monthly` bills every 2 months.",
+            "example": 1
+          },
+          "item": {
+            "$ref": "#/components/schemas/CreatePlanItemRequest"
+          }
+        }
+      },
+      "ListPlansResponse": {
+        "type": "object",
+        "description": "Paginated list of plans.",
+        "properties": {
+          "entity": {
+            "type": "string",
+            "description": "Entity type. Always `collection`.",
+            "example": "collection"
+          },
+          "count": {
+            "type": "integer",
+            "description": "Number of plans returned in this response.",
+            "example": 1
+          },
+          "items": {
+            "type": "array",
+            "description": "List of plan objects.",
+            "items": {
+              "$ref": "#/components/schemas/Plan"
+            }
+          }
+        }
+      },
+      "Subscription": {
+        "type": "object",
+        "description": "A Razorpay Subscription object.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier of the subscription.",
+            "example": "sub_00000000000001"
+          },
+          "entity": {
+            "type": "string",
+            "description": "Entity type. Always `subscription`.",
+            "example": "subscription"
+          },
+          "plan_id": {
+            "type": "string",
+            "description": "Unique identifier of the plan associated with this subscription.",
+            "example": "plan_00000000000001"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current status of the subscription.",
+            "enum": ["created", "authenticated", "active", "pending", "halted", "cancelled", "completed", "expired"],
+            "example": "created"
+          },
+          "total_count": {
+            "type": "integer",
+            "description": "Total number of billing cycles in the subscription.",
+            "example": 6
+          },
+          "paid_count": {
+            "type": "integer",
+            "description": "Number of billing cycles that have been successfully paid.",
+            "example": 0
+          },
+          "remaining_count": {
+            "type": "integer",
+            "description": "Number of billing cycles remaining.",
+            "example": 6
+          },
+          "customer_notify": {
+            "type": "integer",
+            "description": "Indicates whether the customer should be notified. `1` for yes, `0` for no.",
+            "enum": [0, 1],
+            "example": 1
+          },
+          "start_at": {
+            "type": "integer",
+            "description": "Unix timestamp at which the subscription starts billing.",
+            "example": 1580453311,
+            "nullable": true
+          },
+          "end_at": {
+            "type": "integer",
+            "description": "Unix timestamp at which the subscription ends.",
+            "example": null,
+            "nullable": true
+          },
+          "charge_at": {
+            "type": "integer",
+            "description": "Unix timestamp of the next scheduled charge.",
+            "example": 1580453311,
+            "nullable": true
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp at which the subscription was created.",
+            "example": 1580453311
+          }
+        }
+      },
+      "CreateSubscriptionRequest": {
+        "type": "object",
+        "required": ["plan_id", "total_count"],
+        "properties": {
+          "plan_id": {
+            "type": "string",
+            "description": "Unique identifier of the plan to subscribe to.",
+            "example": "plan_00000000000001"
+          },
+          "total_count": {
+            "type": "integer",
+            "description": "Total number of billing cycles for the subscription.",
+            "example": 6
+          },
+          "customer_notify": {
+            "type": "integer",
+            "description": "Set to `1` to notify the customer via email and SMS, `0` to suppress notifications.",
+            "enum": [0, 1],
+            "example": 1
+          },
+          "start_at": {
+            "type": "integer",
+            "description": "Unix timestamp at which the subscription should start. Defaults to the current time if not provided.",
+            "example": 1580453311
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Number of subscriptions to be charged on a single charge.",
+            "example": 1
+          },
+          "addons": {
+            "type": "array",
+            "description": "List of add-ons to include with the subscription.",
+            "items": {
+              "type": "object"
+            },
+            "example": []
+          },
+          "notes": {
+            "type": "object",
+            "description": "Key-value pairs for storing additional information. Maximum 15 pairs, each key up to 40 characters and value up to 256 characters.",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "notes_key_1": "Tea, Earl Grey, Hot",
+              "notes_key_2": "Tea, Earl Grey… decaf."
+            }
+          }
+        }
+      },
+      "CancelSubscriptionRequest": {
+        "type": "object",
+        "properties": {
+          "cancel_at_cycle_end": {
+            "type": "integer",
+            "description": "Set to `1` to cancel the subscription at the end of the current billing cycle. Set to `0` to cancel immediately.",
+            "enum": [0, 1],
+            "example": 0
+          }
+        }
+      },
+      "ListPaymentLinksResponse": {
+        "type": "object",
+        "description": "Paginated list of payment links.",
+        "properties": {
+          "entity": {
+            "type": "string",
+            "description": "Entity type. Always `collection`.",
+            "example": "collection"
+          },
+          "count": {
+            "type": "integer",
+            "description": "Number of payment links returned in this response.",
+            "example": 1
+          },
+          "items": {
+            "type": "array",
+            "description": "List of payment link objects.",
+            "items": {
+              "$ref": "#/components/schemas/PaymentLink"
+            }
+          }
+        }
+      },
+      "ListSubscriptionsResponse": {
+        "type": "object",
+        "description": "Paginated list of subscriptions.",
+        "properties": {
+          "entity": {
+            "type": "string",
+            "description": "Entity type. Always `collection`.",
+            "example": "collection"
+          },
+          "count": {
+            "type": "integer",
+            "description": "Number of subscriptions returned in this response.",
+            "example": 1
+          },
+          "items": {
+            "type": "array",
+            "description": "List of subscription objects.",
+            "items": {
+              "$ref": "#/components/schemas/Subscription"
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error response from the Razorpay API.",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Error code.",
+                "example": "BAD_REQUEST_ERROR"
+              },
+              "description": {
+                "type": "string",
+                "description": "Human-readable description of the error.",
+                "example": "The amount must be greater than 0."
+              },
+              "field": {
+                "type": "string",
+                "description": "The field that caused the error, if applicable.",
+                "example": "amount",
+                "nullable": true
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/payment_links": {
+      "get": {
+        "tags": ["Payment Links"],
+        "summary": "List all payment links",
+        "description": "Returns a paginated list of all payment links created for your account.",
+        "operationId": "listPaymentLinks",
+        "parameters": [
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "description": "Number of payment links to return. Default is 10, maximum is 100.",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "maximum": 100,
+              "example": 10
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "description": "Number of payment links to skip before returning results. Used for pagination.",
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "example": 0
+            }
+          },
+          {
+            "name": "reference_id",
+            "in": "query",
+            "required": false,
+            "description": "Filter by your internal reference ID.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of payment links retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListPaymentLinksResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or missing API credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Payment Links"],
+        "summary": "Create a payment link",
+        "description": "Creates a new payment link that can be shared with customers to collect payments.",
+        "operationId": "createPaymentLink",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentLinkRequest"
+              },
+              "example": {
+                "amount": 50000,
+                "currency": "INR",
+                "description": "Payment for policy no #23456",
+                "customer": {
+                  "name": "Gaurav Kumar",
+                  "email": "gaurav.kumar@example.com",
+                  "contact": "+919900000000"
+                },
+                "notify": {
+                  "sms": true,
+                  "email": true
+                },
+                "reminder_enable": true,
+                "expire_by": 1691097057,
+                "accept_partial": false,
+                "reference_id": "TS1989"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment link created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentLink"
+                },
+                "example": {
+                  "id": "plink_ERgihyaAAC0VNW",
+                  "entity": "payment_link",
+                  "accept_partial": false,
+                  "amount": 50000,
+                  "amount_paid": 0,
+                  "cancelled_at": null,
+                  "created_at": 1591097057,
+                  "currency": "INR",
+                  "customer": {
+                    "name": "Gaurav Kumar",
+                    "email": "gaurav.kumar@example.com",
+                    "contact": "+919900000000"
+                  },
+                  "description": "Payment for policy no #23456",
+                  "expire_by": 1691097057,
+                  "expired_at": null,
+                  "reference_id": "TS1989",
+                  "reminder_enable": true,
+                  "short_url": "https://rzp.io/i/nxrHnLJ",
+                  "status": "created",
+                  "updated_at": 1591097057,
+                  "user_id": ""
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. The request body is missing required fields or contains invalid values.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or missing API credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payment_links/{id}": {
+      "get": {
+        "tags": ["Payment Links"],
+        "summary": "Fetch a payment link",
+        "description": "Retrieves the details of a specific payment link by its ID.",
+        "operationId": "getPaymentLink",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the payment link.",
+            "schema": {
+              "type": "string",
+              "example": "plink_ERgihyaAAC0VNW"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment link details retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentLink"
+                },
+                "example": {
+                  "id": "plink_ERgihyaAAC0VNW",
+                  "entity": "payment_link",
+                  "accept_partial": false,
+                  "amount": 50000,
+                  "amount_paid": 0,
+                  "cancelled_at": null,
+                  "created_at": 1591097057,
+                  "currency": "INR",
+                  "customer": {
+                    "name": "Gaurav Kumar",
+                    "email": "gaurav.kumar@example.com",
+                    "contact": "+919900000000"
+                  },
+                  "description": "Payment for policy no #23456",
+                  "expire_by": 1691097057,
+                  "expired_at": null,
+                  "reference_id": "TS1989",
+                  "reminder_enable": true,
+                  "short_url": "https://rzp.io/i/nxrHnLJ",
+                  "status": "created",
+                  "updated_at": 1591097057,
+                  "user_id": ""
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or missing API credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Payment link not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Payment Links"],
+        "summary": "Update a payment link",
+        "description": "Updates the details of an existing payment link. Only `expire_by` and `reminder_enable` can be updated.",
+        "operationId": "updatePaymentLink",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the payment link to update.",
+            "schema": {
+              "type": "string",
+              "example": "plink_ERgihyaAAC0VNW"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePaymentLinkRequest"
+              },
+              "example": {
+                "expire_by": 1791097057,
+                "reminder_enable": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment link updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentLink"
+                },
+                "example": {
+                  "id": "plink_ERgihyaAAC0VNW",
+                  "entity": "payment_link",
+                  "accept_partial": false,
+                  "amount": 50000,
+                  "amount_paid": 0,
+                  "cancelled_at": null,
+                  "created_at": 1591097057,
+                  "currency": "INR",
+                  "customer": {
+                    "name": "Gaurav Kumar",
+                    "email": "gaurav.kumar@example.com",
+                    "contact": "+919900000000"
+                  },
+                  "description": "Payment for policy no #23456",
+                  "expire_by": 1791097057,
+                  "expired_at": null,
+                  "reference_id": "TS1989",
+                  "reminder_enable": false,
+                  "short_url": "https://rzp.io/i/nxrHnLJ",
+                  "status": "created",
+                  "updated_at": 1591197057,
+                  "user_id": ""
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. The request body contains invalid values.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or missing API credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Payment link not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payment_links/{id}/cancel": {
+      "post": {
+        "tags": ["Payment Links"],
+        "summary": "Cancel a payment link",
+        "description": "Cancels an existing payment link. Once cancelled, the link can no longer be used to accept payments.",
+        "operationId": "cancelPaymentLink",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the payment link to cancel.",
+            "schema": {
+              "type": "string",
+              "example": "plink_ERgihyaAAC0VNW"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment link cancelled successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentLink"
+                },
+                "example": {
+                  "id": "plink_ERgihyaAAC0VNW",
+                  "entity": "payment_link",
+                  "accept_partial": false,
+                  "amount": 50000,
+                  "amount_paid": 0,
+                  "cancelled_at": 1591197057,
+                  "created_at": 1591097057,
+                  "currency": "INR",
+                  "customer": {
+                    "name": "Gaurav Kumar",
+                    "email": "gaurav.kumar@example.com",
+                    "contact": "+919900000000"
+                  },
+                  "description": "Payment for policy no #23456",
+                  "expire_by": 1691097057,
+                  "expired_at": null,
+                  "reference_id": "TS1989",
+                  "reminder_enable": true,
+                  "short_url": "https://rzp.io/i/nxrHnLJ",
+                  "status": "cancelled",
+                  "updated_at": 1591197057,
+                  "user_id": ""
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. The payment link may already be cancelled or paid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or missing API credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Payment link not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plans": {
+      "post": {
+        "tags": ["Plans"],
+        "summary": "Create a plan",
+        "description": "Creates a new subscription plan that defines the billing period and amount.",
+        "operationId": "createPlan",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePlanRequest"
+              },
+              "example": {
+                "period": "weekly",
+                "interval": 1,
+                "item": {
+                  "name": "Test Weekly 1",
+                  "amount": 500,
+                  "currency": "INR",
+                  "description": "Description for the weekly plan"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Plan created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Plan"
+                },
+                "example": {
+                  "id": "plan_00000000000001",
+                  "entity": "plan",
+                  "interval": 1,
+                  "period": "weekly",
+                  "item": {
+                    "id": "item_00000000000001",
+                    "active": true,
+                    "amount": 500,
+                    "unit_amount": 500,
+                    "currency": "INR",
+                    "name": "Test Weekly 1",
+                    "description": "Description for the weekly plan"
+                  },
+                  "created_at": 1580453311
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. The request body is missing required fields or contains invalid values.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or missing API credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Plans"],
+        "summary": "List all plans",
+        "description": "Returns a paginated list of all plans created for your account.",
+        "operationId": "listPlans",
+        "parameters": [
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "description": "Number of plans to return. Default is 10, maximum is 100.",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "maximum": 100,
+              "example": 10
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "description": "Number of plans to skip before returning results. Used for pagination.",
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "example": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of plans retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListPlansResponse"
+                },
+                "example": {
+                  "entity": "collection",
+                  "count": 1,
+                  "items": [
+                    {
+                      "id": "plan_00000000000001",
+                      "entity": "plan",
+                      "interval": 1,
+                      "period": "weekly",
+                      "item": {
+                        "id": "item_00000000000001",
+                        "active": true,
+                        "amount": 500,
+                        "unit_amount": 500,
+                        "currency": "INR",
+                        "name": "Test Weekly 1",
+                        "description": "Description for the weekly plan"
+                      },
+                      "created_at": 1580453311
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or missing API credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plans/{id}": {
+      "get": {
+        "tags": ["Plans"],
+        "summary": "Fetch a plan",
+        "description": "Retrieves the details of a specific plan by its ID.",
+        "operationId": "getPlan",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the plan.",
+            "schema": {
+              "type": "string",
+              "example": "plan_00000000000001"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Plan details retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Plan"
+                },
+                "example": {
+                  "id": "plan_00000000000001",
+                  "entity": "plan",
+                  "interval": 1,
+                  "period": "weekly",
+                  "item": {
+                    "id": "item_00000000000001",
+                    "active": true,
+                    "amount": 500,
+                    "unit_amount": 500,
+                    "currency": "INR",
+                    "name": "Test Weekly 1",
+                    "description": "Description for the weekly plan"
+                  },
+                  "created_at": 1580453311
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or missing API credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Plan not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions": {
+      "post": {
+        "tags": ["Subscriptions"],
+        "summary": "Create a subscription",
+        "description": "Creates a new subscription for a customer based on an existing plan.",
+        "operationId": "createSubscription",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubscriptionRequest"
+              },
+              "example": {
+                "plan_id": "plan_00000000000001",
+                "total_count": 6,
+                "customer_notify": 1,
+                "start_at": 1580453311,
+                "quantity": 1,
+                "addons": [],
+                "notes": {
+                  "notes_key_1": "Tea, Earl Grey, Hot",
+                  "notes_key_2": "Tea, Earl Grey… decaf."
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                },
+                "example": {
+                  "id": "sub_00000000000001",
+                  "entity": "subscription",
+                  "plan_id": "plan_00000000000001",
+                  "status": "created",
+                  "total_count": 6,
+                  "paid_count": 0,
+                  "remaining_count": 6,
+                  "customer_notify": 1,
+                  "start_at": 1580453311,
+                  "end_at": null,
+                  "charge_at": 1580453311,
+                  "created_at": 1580453311
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. The request body is missing required fields or contains invalid values.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or missing API credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Subscriptions"],
+        "summary": "List all subscriptions",
+        "description": "Returns a paginated list of all subscriptions for your account.",
+        "operationId": "listSubscriptions",
+        "parameters": [
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "description": "Number of subscriptions to return. Default is 10, maximum is 100.",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "maximum": 100,
+              "example": 10
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "description": "Number of subscriptions to skip before returning results. Used for pagination.",
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "example": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of subscriptions retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListSubscriptionsResponse"
+                },
+                "example": {
+                  "entity": "collection",
+                  "count": 1,
+                  "items": [
+                    {
+                      "id": "sub_00000000000001",
+                      "entity": "subscription",
+                      "plan_id": "plan_00000000000001",
+                      "status": "created",
+                      "total_count": 6,
+                      "paid_count": 0,
+                      "remaining_count": 6,
+                      "customer_notify": 1,
+                      "start_at": 1580453311,
+                      "end_at": null,
+                      "charge_at": 1580453311,
+                      "created_at": 1580453311
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or missing API credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{id}": {
+      "get": {
+        "tags": ["Subscriptions"],
+        "summary": "Fetch a subscription",
+        "description": "Retrieves the details of a specific subscription by its ID.",
+        "operationId": "getSubscription",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the subscription.",
+            "schema": {
+              "type": "string",
+              "example": "sub_00000000000001"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription details retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                },
+                "example": {
+                  "id": "sub_00000000000001",
+                  "entity": "subscription",
+                  "plan_id": "plan_00000000000001",
+                  "status": "active",
+                  "total_count": 6,
+                  "paid_count": 1,
+                  "remaining_count": 5,
+                  "customer_notify": 1,
+                  "start_at": 1580453311,
+                  "end_at": null,
+                  "charge_at": 1581058111,
+                  "created_at": 1580453311
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or missing API credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscription not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{id}/cancel": {
+      "post": {
+        "tags": ["Subscriptions"],
+        "summary": "Cancel a subscription",
+        "description": "Cancels an active subscription. You can choose to cancel immediately or at the end of the current billing cycle.",
+        "operationId": "cancelSubscription",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the subscription to cancel.",
+            "schema": {
+              "type": "string",
+              "example": "sub_00000000000001"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelSubscriptionRequest"
+              },
+              "example": {
+                "cancel_at_cycle_end": 0
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription cancelled successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                },
+                "example": {
+                  "id": "sub_00000000000001",
+                  "entity": "subscription",
+                  "plan_id": "plan_00000000000001",
+                  "status": "cancelled",
+                  "total_count": 6,
+                  "paid_count": 1,
+                  "remaining_count": 5,
+                  "customer_notify": 1,
+                  "start_at": 1580453311,
+                  "end_at": null,
+                  "charge_at": null,
+                  "created_at": 1580453311
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. The subscription may already be cancelled or in a non-cancellable state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or missing API credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscription not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Payment Links",
+      "description": "Create and manage payment links to collect payments from customers without building a checkout flow."
+    },
+    {
+      "name": "Plans",
+      "description": "Create and manage plans that define the billing period and amount for subscriptions."
+    },
+    {
+      "name": "Subscriptions",
+      "description": "Create and manage recurring subscriptions for customers based on defined plans."
+    }
+  ]
+}

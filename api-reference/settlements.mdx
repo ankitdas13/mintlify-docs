@@ -1,0 +1,77 @@
+---
+title: 'Settlements API — list and fetch Razorpay settlements'
+description: 'Retrieve settlement records showing funds transferred to your bank account on the T+2 cycle, including processing fees, GST, and the bank UTR reference.'
+---
+
+Razorpay settles funds from captured payments to your bank account on a **T+2 business day** cycle by default. Each settlement record covers payments, refunds, transfers, and adjustments for a given period.
+
+---
+
+## List settlements
+
+`GET /v1/settlements`
+
+```bash
+curl -X GET "https://api.razorpay.com/v1/settlements?count=10" \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET
+```
+
+### Response
+
+```json
+{
+  "entity": "collection",
+  "count": 1,
+  "items": [
+    {
+      "id": "setlmnt_FQzNIarBr3mItW",
+      "entity": "settlement",
+      "amount": 1000000,
+      "status": "processed",
+      "fees": 1180,
+      "tax": 180,
+      "utr": "RAZORPAY12345",
+      "created_at": 1591097057
+    }
+  ]
+}
+```
+
+<ResponseField name="id" type="string">
+  Unique settlement identifier.
+</ResponseField>
+
+<ResponseField name="amount" type="integer">
+  Total amount settled to your bank account, in the smallest currency unit.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Settlement status. One of `created`, `processed`, or `failed`.
+</ResponseField>
+
+<ResponseField name="fees" type="integer">
+  Razorpay processing fees deducted from this settlement, in the smallest currency unit.
+</ResponseField>
+
+<ResponseField name="tax" type="integer">
+  Tax charged on processing fees, in the smallest currency unit.
+</ResponseField>
+
+<ResponseField name="utr" type="string">
+  Unique Transaction Reference number provided by your bank for the settlement transfer.
+</ResponseField>
+
+<ResponseField name="created_at" type="integer">
+  Unix timestamp of when the settlement was created.
+</ResponseField>
+
+---
+
+## Fetch a settlement
+
+`GET /v1/settlements/:id`
+
+```bash
+curl -X GET https://api.razorpay.com/v1/settlements/setlmnt_FQzNIarBr3mItW \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET
+```

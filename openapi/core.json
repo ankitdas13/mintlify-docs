@@ -1,0 +1,1200 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Razorpay Core Resources API",
+    "description": "The Razorpay Core Resources API provides endpoints for managing Orders, Payments, Refunds, and Settlements. Use HTTP Basic Auth with your Key ID as the username and Key Secret as the password.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Razorpay Support",
+      "url": "https://razorpay.com/support"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.razorpay.com/v1",
+      "description": "Razorpay Production API"
+    }
+  ],
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Use your Razorpay Key ID as the username and Key Secret as the password."
+      }
+    },
+    "schemas": {
+      "Order": {
+        "type": "object",
+        "description": "A Razorpay Order object representing a payment order.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the order.",
+            "example": "order_IluGWxBm9U8zJ8"
+          },
+          "entity": {
+            "type": "string",
+            "description": "Entity type, always `order` for order objects.",
+            "example": "order"
+          },
+          "amount": {
+            "type": "integer",
+            "description": "The order amount in the smallest currency sub-unit (e.g., paise for INR). For example, 50000 represents ₹500.",
+            "example": 50000
+          },
+          "amount_paid": {
+            "type": "integer",
+            "description": "The amount paid against the order, in the smallest currency sub-unit.",
+            "example": 0
+          },
+          "amount_due": {
+            "type": "integer",
+            "description": "The remaining amount to be paid against the order, in the smallest currency sub-unit.",
+            "example": 50000
+          },
+          "currency": {
+            "type": "string",
+            "description": "The ISO 4217 currency code for the order.",
+            "example": "INR"
+          },
+          "receipt": {
+            "type": "string",
+            "description": "A unique receipt number provided by the merchant for internal reference.",
+            "example": "receipt_1001"
+          },
+          "status": {
+            "type": "string",
+            "description": "The current status of the order.",
+            "enum": ["created", "attempted", "paid"],
+            "example": "created"
+          },
+          "attempts": {
+            "type": "integer",
+            "description": "The number of payment attempts made against this order.",
+            "example": 0
+          },
+          "notes": {
+            "type": "object",
+            "description": "A key-value store of custom metadata to attach to the order. Values must be strings.",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "customer_name": "John Doe",
+              "order_type": "premium"
+            }
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp (in seconds) at which the order was created.",
+            "example": 1595491008
+          }
+        }
+      },
+      "OrderCreateRequest": {
+        "type": "object",
+        "description": "Request body for creating a new order.",
+        "required": ["amount", "currency"],
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "description": "The transaction amount in the smallest currency sub-unit (e.g., paise for INR). For example, 50000 represents ₹500. Must be a positive integer.",
+            "example": 50000
+          },
+          "currency": {
+            "type": "string",
+            "description": "The ISO 4217 currency code for the transaction. Currently only `INR` is supported.",
+            "example": "INR"
+          },
+          "receipt": {
+            "type": "string",
+            "description": "A unique receipt number for the order, for your internal reference. Maximum length is 40 characters.",
+            "example": "receipt_1001"
+          },
+          "notes": {
+            "type": "object",
+            "description": "A key-value store of custom metadata to attach to the order. Maximum 15 key-value pairs, with keys and values up to 256 characters each.",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "customer_name": "John Doe",
+              "order_type": "premium"
+            }
+          },
+          "partial_payment": {
+            "type": "boolean",
+            "description": "Whether the order allows partial payments. If `true`, the customer can pay the amount in multiple installments.",
+            "example": false
+          }
+        }
+      },
+      "OrderListResponse": {
+        "type": "object",
+        "description": "A paginated list of order objects.",
+        "properties": {
+          "entity": {
+            "type": "string",
+            "description": "Entity type, always `collection` for list responses.",
+            "example": "collection"
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of orders returned in this response.",
+            "example": 10
+          },
+          "items": {
+            "type": "array",
+            "description": "An array of order objects.",
+            "items": {
+              "$ref": "#/components/schemas/Order"
+            }
+          }
+        }
+      },
+      "Payment": {
+        "type": "object",
+        "description": "A Razorpay Payment object representing a payment transaction.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the payment.",
+            "example": "pay_DJkTfWoJ5ZFPce"
+          },
+          "entity": {
+            "type": "string",
+            "description": "Entity type, always `payment` for payment objects.",
+            "example": "payment"
+          },
+          "amount": {
+            "type": "integer",
+            "description": "The payment amount in the smallest currency sub-unit (e.g., paise for INR).",
+            "example": 50000
+          },
+          "currency": {
+            "type": "string",
+            "description": "The ISO 4217 currency code for the payment.",
+            "example": "INR"
+          },
+          "status": {
+            "type": "string",
+            "description": "The current status of the payment.",
+            "enum": ["created", "authorized", "captured", "refunded", "failed"],
+            "example": "captured"
+          },
+          "order_id": {
+            "type": "string",
+            "description": "The unique identifier of the order associated with this payment.",
+            "example": "order_IluGWxBm9U8zJ8"
+          },
+          "method": {
+            "type": "string",
+            "description": "The payment method used for this transaction.",
+            "enum": ["card", "netbanking", "wallet", "upi", "emi"],
+            "example": "upi"
+          },
+          "captured": {
+            "type": "boolean",
+            "description": "Indicates whether the payment has been captured. `true` if the payment is captured.",
+            "example": true
+          },
+          "description": {
+            "type": "string",
+            "description": "A brief description of the payment.",
+            "example": "Payment for order #1001"
+          },
+          "email": {
+            "type": "string",
+            "description": "The email address of the customer who made the payment.",
+            "example": "john.doe@example.com"
+          },
+          "contact": {
+            "type": "string",
+            "description": "The phone number of the customer who made the payment.",
+            "example": "+919876543210"
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp (in seconds) at which the payment was created.",
+            "example": 1595491108
+          }
+        }
+      },
+      "PaymentCaptureRequest": {
+        "type": "object",
+        "description": "Request body for capturing an authorized payment.",
+        "required": ["amount", "currency"],
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "description": "The amount to capture, in the smallest currency sub-unit. Must be equal to or less than the authorized payment amount.",
+            "example": 50000
+          },
+          "currency": {
+            "type": "string",
+            "description": "The ISO 4217 currency code. Must match the currency of the original payment.",
+            "example": "INR"
+          }
+        }
+      },
+      "PaymentListResponse": {
+        "type": "object",
+        "description": "A paginated list of payment objects.",
+        "properties": {
+          "entity": {
+            "type": "string",
+            "description": "Entity type, always `collection` for list responses.",
+            "example": "collection"
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of payments returned in this response.",
+            "example": 10
+          },
+          "items": {
+            "type": "array",
+            "description": "An array of payment objects.",
+            "items": {
+              "$ref": "#/components/schemas/Payment"
+            }
+          }
+        }
+      },
+      "Refund": {
+        "type": "object",
+        "description": "A Razorpay Refund object representing a refund transaction.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the refund.",
+            "example": "rfnd_FP8QHiV938haTz"
+          },
+          "entity": {
+            "type": "string",
+            "description": "Entity type, always `refund` for refund objects.",
+            "example": "refund"
+          },
+          "amount": {
+            "type": "integer",
+            "description": "The refund amount in the smallest currency sub-unit (e.g., paise for INR).",
+            "example": 50000
+          },
+          "currency": {
+            "type": "string",
+            "description": "The ISO 4217 currency code for the refund.",
+            "example": "INR"
+          },
+          "payment_id": {
+            "type": "string",
+            "description": "The unique identifier of the payment against which the refund was initiated.",
+            "example": "pay_DJkTfWoJ5ZFPce"
+          },
+          "status": {
+            "type": "string",
+            "description": "The current status of the refund.",
+            "enum": ["pending", "processed", "failed"],
+            "example": "processed"
+          },
+          "speed_processed": {
+            "type": "string",
+            "description": "The processing speed at which the refund was processed. `normal` refunds are processed within 5-7 business days; `optimum` refunds are processed instantly where supported.",
+            "example": "normal"
+          },
+          "receipt": {
+            "type": "string",
+            "description": "A unique receipt number for the refund, for your internal reference.",
+            "example": "receipt_refund_1001"
+          },
+          "notes": {
+            "type": "object",
+            "description": "A key-value store of custom metadata attached to the refund.",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "reason": "Customer request"
+            }
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp (in seconds) at which the refund was created.",
+            "example": 1595491208
+          }
+        }
+      },
+      "RefundCreateRequest": {
+        "type": "object",
+        "description": "Request body for creating a refund against a payment. If `amount` is omitted, a full refund is initiated.",
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "description": "The amount to refund, in the smallest currency sub-unit. If not provided, the full payment amount is refunded. Must not exceed the captured payment amount.",
+            "example": 50000
+          },
+          "speed": {
+            "type": "string",
+            "description": "The processing speed for the refund. `normal` takes 5-7 business days; `optimum` processes instantly where supported, falling back to `normal` otherwise.",
+            "enum": ["normal", "optimum"],
+            "example": "normal"
+          },
+          "notes": {
+            "type": "object",
+            "description": "A key-value store of custom metadata to attach to the refund.",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "reason": "Customer request"
+            }
+          },
+          "receipt": {
+            "type": "string",
+            "description": "A unique receipt number for the refund, for your internal reference.",
+            "example": "receipt_refund_1001"
+          }
+        }
+      },
+      "Settlement": {
+        "type": "object",
+        "description": "A Razorpay Settlement object representing the transfer of funds to your bank account.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the settlement.",
+            "example": "setlmnt_FQzNIarBr3mItW"
+          },
+          "entity": {
+            "type": "string",
+            "description": "Entity type, always `settlement` for settlement objects.",
+            "example": "settlement"
+          },
+          "amount": {
+            "type": "integer",
+            "description": "The total amount settled to your bank account, in the smallest currency sub-unit (e.g., paise for INR).",
+            "example": 1000000
+          },
+          "status": {
+            "type": "string",
+            "description": "The current status of the settlement.",
+            "enum": ["created", "processed", "failed"],
+            "example": "processed"
+          },
+          "fees": {
+            "type": "integer",
+            "description": "The total Razorpay fees charged for this settlement, in the smallest currency sub-unit.",
+            "example": 2000
+          },
+          "tax": {
+            "type": "integer",
+            "description": "The tax amount (GST) charged on the Razorpay fees, in the smallest currency sub-unit.",
+            "example": 360
+          },
+          "utr": {
+            "type": "string",
+            "description": "Unique Transaction Reference number assigned by the bank for this settlement transfer.",
+            "example": "HDFC2104081234567"
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix timestamp (in seconds) at which the settlement was created.",
+            "example": 1595491308
+          }
+        }
+      },
+      "SettlementListResponse": {
+        "type": "object",
+        "description": "A paginated list of settlement objects.",
+        "properties": {
+          "entity": {
+            "type": "string",
+            "description": "Entity type, always `collection` for list responses.",
+            "example": "collection"
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of settlements returned in this response.",
+            "example": 10
+          },
+          "items": {
+            "type": "array",
+            "description": "An array of settlement objects.",
+            "items": {
+              "$ref": "#/components/schemas/Settlement"
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "An error response returned by the API.",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable error code.",
+                "example": "BAD_REQUEST_ERROR"
+              },
+              "description": {
+                "type": "string",
+                "description": "A human-readable description of the error.",
+                "example": "The amount must be at least 100 paise."
+              },
+              "source": {
+                "type": "string",
+                "description": "The source of the error (e.g., `business` or `customer`).",
+                "example": "business"
+              },
+              "step": {
+                "type": "string",
+                "description": "The step at which the error occurred.",
+                "example": "payment_initiation"
+              },
+              "reason": {
+                "type": "string",
+                "description": "A brief reason for the error.",
+                "example": "input_validation_failed"
+              },
+              "metadata": {
+                "type": "object",
+                "description": "Additional metadata about the error.",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "CountParam": {
+        "name": "count",
+        "in": "query",
+        "description": "The number of items to return per page. Maximum value is 100.",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "maximum": 100,
+          "default": 10,
+          "example": 25
+        }
+      },
+      "SkipParam": {
+        "name": "skip",
+        "in": "query",
+        "description": "The number of items to skip from the beginning of the list, used for pagination.",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "default": 0,
+          "example": 10
+        }
+      },
+      "FromParam": {
+        "name": "from",
+        "in": "query",
+        "description": "Unix timestamp (in seconds). Only items created on or after this time are returned.",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "example": 1609459200
+        }
+      },
+      "ToParam": {
+        "name": "to",
+        "in": "query",
+        "description": "Unix timestamp (in seconds). Only items created on or before this time are returned.",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "example": 1640995200
+        }
+      }
+    },
+    "responses": {
+      "UnauthorizedError": {
+        "description": "Authentication credentials are missing or invalid.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "NotFoundError": {
+        "description": "The requested resource was not found.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "BadRequestError": {
+        "description": "The request was invalid or contained incorrect parameters.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/orders": {
+      "post": {
+        "summary": "Create an Order",
+        "description": "Creates a new order. An order represents a payment intent. You must create an order before accepting a payment from a customer.",
+        "operationId": "createOrder",
+        "tags": ["Orders"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreateRequest"
+              },
+              "example": {
+                "amount": 50000,
+                "currency": "INR",
+                "receipt": "receipt_1001",
+                "notes": {
+                  "customer_name": "John Doe",
+                  "order_type": "premium"
+                },
+                "partial_payment": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The order was successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                },
+                "example": {
+                  "id": "order_IluGWxBm9U8zJ8",
+                  "entity": "order",
+                  "amount": 50000,
+                  "amount_paid": 0,
+                  "amount_due": 50000,
+                  "currency": "INR",
+                  "receipt": "receipt_1001",
+                  "status": "created",
+                  "attempts": 0,
+                  "notes": {
+                    "customer_name": "John Doe",
+                    "order_type": "premium"
+                  },
+                  "created_at": 1595491008
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      },
+      "get": {
+        "summary": "List Orders",
+        "description": "Returns a list of orders. The orders are returned in reverse chronological order (most recent first). Use the `count` and `skip` parameters to paginate through results.",
+        "operationId": "listOrders",
+        "tags": ["Orders"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CountParam"
+          },
+          {
+            "$ref": "#/components/parameters/SkipParam"
+          },
+          {
+            "$ref": "#/components/parameters/FromParam"
+          },
+          {
+            "$ref": "#/components/parameters/ToParam"
+          },
+          {
+            "name": "authorized",
+            "in": "query",
+            "description": "Filter orders by their authorization status. Set to `true` to return only orders that have been authorized.",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          },
+          {
+            "name": "receipt",
+            "in": "query",
+            "description": "Filter orders by a specific receipt number.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "receipt_1001"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of orders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderListResponse"
+                },
+                "example": {
+                  "entity": "collection",
+                  "count": 2,
+                  "items": [
+                    {
+                      "id": "order_IluGWxBm9U8zJ8",
+                      "entity": "order",
+                      "amount": 50000,
+                      "amount_paid": 50000,
+                      "amount_due": 0,
+                      "currency": "INR",
+                      "receipt": "receipt_1001",
+                      "status": "paid",
+                      "attempts": 1,
+                      "notes": {
+                        "customer_name": "John Doe"
+                      },
+                      "created_at": 1595491008
+                    },
+                    {
+                      "id": "order_IluGWxCn0V9aK9",
+                      "entity": "order",
+                      "amount": 100000,
+                      "amount_paid": 0,
+                      "amount_due": 100000,
+                      "currency": "INR",
+                      "receipt": "receipt_1002",
+                      "status": "created",
+                      "attempts": 0,
+                      "notes": {},
+                      "created_at": 1595491108
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/orders/{id}": {
+      "get": {
+        "summary": "Fetch an Order",
+        "description": "Retrieves the details of a specific order using its unique identifier.",
+        "operationId": "getOrder",
+        "tags": ["Orders"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the order to retrieve.",
+            "schema": {
+              "type": "string",
+              "example": "order_IluGWxBm9U8zJ8"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The order details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                },
+                "example": {
+                  "id": "order_IluGWxBm9U8zJ8",
+                  "entity": "order",
+                  "amount": 50000,
+                  "amount_paid": 50000,
+                  "amount_due": 0,
+                  "currency": "INR",
+                  "receipt": "receipt_1001",
+                  "status": "paid",
+                  "attempts": 1,
+                  "notes": {
+                    "customer_name": "John Doe",
+                    "order_type": "premium"
+                  },
+                  "created_at": 1595491008
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/payments": {
+      "get": {
+        "summary": "List Payments",
+        "description": "Returns a list of payments. The payments are returned in reverse chronological order (most recent first). Use the `count` and `skip` parameters to paginate through results.",
+        "operationId": "listPayments",
+        "tags": ["Payments"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CountParam"
+          },
+          {
+            "$ref": "#/components/parameters/SkipParam"
+          },
+          {
+            "$ref": "#/components/parameters/FromParam"
+          },
+          {
+            "$ref": "#/components/parameters/ToParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of payments.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentListResponse"
+                },
+                "example": {
+                  "entity": "collection",
+                  "count": 2,
+                  "items": [
+                    {
+                      "id": "pay_DJkTfWoJ5ZFPce",
+                      "entity": "payment",
+                      "amount": 50000,
+                      "currency": "INR",
+                      "status": "captured",
+                      "order_id": "order_IluGWxBm9U8zJ8",
+                      "method": "upi",
+                      "captured": true,
+                      "description": "Payment for order #1001",
+                      "email": "john.doe@example.com",
+                      "contact": "+919876543210",
+                      "created_at": 1595491108
+                    },
+                    {
+                      "id": "pay_EKmTfXpK6AGQdf",
+                      "entity": "payment",
+                      "amount": 100000,
+                      "currency": "INR",
+                      "status": "authorized",
+                      "order_id": "order_IluGWxCn0V9aK9",
+                      "method": "card",
+                      "captured": false,
+                      "description": "Payment for order #1002",
+                      "email": "jane.doe@example.com",
+                      "contact": "+919876543211",
+                      "created_at": 1595491208
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/payments/{id}": {
+      "get": {
+        "summary": "Fetch a Payment",
+        "description": "Retrieves the details of a specific payment using its unique identifier.",
+        "operationId": "getPayment",
+        "tags": ["Payments"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the payment to retrieve.",
+            "schema": {
+              "type": "string",
+              "example": "pay_DJkTfWoJ5ZFPce"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The payment details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Payment"
+                },
+                "example": {
+                  "id": "pay_DJkTfWoJ5ZFPce",
+                  "entity": "payment",
+                  "amount": 50000,
+                  "currency": "INR",
+                  "status": "captured",
+                  "order_id": "order_IluGWxBm9U8zJ8",
+                  "method": "upi",
+                  "captured": true,
+                  "description": "Payment for order #1001",
+                  "email": "john.doe@example.com",
+                  "contact": "+919876543210",
+                  "created_at": 1595491108
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/payments/{id}/capture": {
+      "post": {
+        "summary": "Capture a Payment",
+        "description": "Captures an authorized payment. A payment must be in `authorized` status to be captured. You can capture for the full authorized amount or a lesser amount.",
+        "operationId": "capturePayment",
+        "tags": ["Payments"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the authorized payment to capture.",
+            "schema": {
+              "type": "string",
+              "example": "pay_DJkTfWoJ5ZFPce"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentCaptureRequest"
+              },
+              "example": {
+                "amount": 50000,
+                "currency": "INR"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The payment was successfully captured. Returns the updated payment object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Payment"
+                },
+                "example": {
+                  "id": "pay_DJkTfWoJ5ZFPce",
+                  "entity": "payment",
+                  "amount": 50000,
+                  "currency": "INR",
+                  "status": "captured",
+                  "order_id": "order_IluGWxBm9U8zJ8",
+                  "method": "upi",
+                  "captured": true,
+                  "description": "Payment for order #1001",
+                  "email": "john.doe@example.com",
+                  "contact": "+919876543210",
+                  "created_at": 1595491108
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/payments/{id}/refund": {
+      "post": {
+        "summary": "Create a Refund",
+        "description": "Initiates a refund against a captured payment. If `amount` is not specified, the full payment amount is refunded. You can issue multiple partial refunds as long as the total does not exceed the captured amount.",
+        "operationId": "createRefund",
+        "tags": ["Refunds"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the captured payment to refund.",
+            "schema": {
+              "type": "string",
+              "example": "pay_DJkTfWoJ5ZFPce"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefundCreateRequest"
+              },
+              "example": {
+                "amount": 50000,
+                "speed": "normal",
+                "notes": {
+                  "reason": "Customer request"
+                },
+                "receipt": "receipt_refund_1001"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The refund was successfully initiated. Returns the refund object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Refund"
+                },
+                "example": {
+                  "id": "rfnd_FP8QHiV938haTz",
+                  "entity": "refund",
+                  "amount": 50000,
+                  "currency": "INR",
+                  "payment_id": "pay_DJkTfWoJ5ZFPce",
+                  "status": "processed",
+                  "speed_processed": "normal",
+                  "receipt": "receipt_refund_1001",
+                  "notes": {
+                    "reason": "Customer request"
+                  },
+                  "created_at": 1595491208
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/refunds/{id}": {
+      "get": {
+        "summary": "Fetch a Refund",
+        "description": "Retrieves the details of a specific refund using its unique identifier.",
+        "operationId": "getRefund",
+        "tags": ["Refunds"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the refund to retrieve.",
+            "schema": {
+              "type": "string",
+              "example": "rfnd_FP8QHiV938haTz"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The refund details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Refund"
+                },
+                "example": {
+                  "id": "rfnd_FP8QHiV938haTz",
+                  "entity": "refund",
+                  "amount": 50000,
+                  "currency": "INR",
+                  "payment_id": "pay_DJkTfWoJ5ZFPce",
+                  "status": "processed",
+                  "speed_processed": "normal",
+                  "receipt": "receipt_refund_1001",
+                  "notes": {
+                    "reason": "Customer request"
+                  },
+                  "created_at": 1595491208
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/settlements": {
+      "get": {
+        "summary": "List Settlements",
+        "description": "Returns a list of settlements. Settlements represent the transfer of funds from Razorpay to your bank account. Use the `count` and `skip` parameters to paginate through results.",
+        "operationId": "listSettlements",
+        "tags": ["Settlements"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CountParam"
+          },
+          {
+            "$ref": "#/components/parameters/SkipParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of settlements.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettlementListResponse"
+                },
+                "example": {
+                  "entity": "collection",
+                  "count": 2,
+                  "items": [
+                    {
+                      "id": "setlmnt_FQzNIarBr3mItW",
+                      "entity": "settlement",
+                      "amount": 1000000,
+                      "status": "processed",
+                      "fees": 2000,
+                      "tax": 360,
+                      "utr": "HDFC2104081234567",
+                      "created_at": 1595491308
+                    },
+                    {
+                      "id": "setlmnt_GRaOJbsCs4nJuX",
+                      "entity": "settlement",
+                      "amount": 500000,
+                      "status": "created",
+                      "fees": 1000,
+                      "tax": 180,
+                      "utr": null,
+                      "created_at": 1595577708
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/settlements/{id}": {
+      "get": {
+        "summary": "Fetch a Settlement",
+        "description": "Retrieves the details of a specific settlement using its unique identifier.",
+        "operationId": "getSettlement",
+        "tags": ["Settlements"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the settlement to retrieve.",
+            "schema": {
+              "type": "string",
+              "example": "setlmnt_FQzNIarBr3mItW"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The settlement details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Settlement"
+                },
+                "example": {
+                  "id": "setlmnt_FQzNIarBr3mItW",
+                  "entity": "settlement",
+                  "amount": 1000000,
+                  "status": "processed",
+                  "fees": 2000,
+                  "tax": 360,
+                  "utr": "HDFC2104081234567",
+                  "created_at": 1595491308
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Orders",
+      "description": "Orders represent payment intents. Create an order before accepting a payment from a customer."
+    },
+    {
+      "name": "Payments",
+      "description": "Payments represent individual payment transactions. Fetch, list, and capture payments."
+    },
+    {
+      "name": "Refunds",
+      "description": "Refunds represent the reversal of a payment back to the customer. Initiate full or partial refunds against captured payments."
+    },
+    {
+      "name": "Settlements",
+      "description": "Settlements represent the transfer of funds collected from payments to your registered bank account."
+    }
+  ]
+}

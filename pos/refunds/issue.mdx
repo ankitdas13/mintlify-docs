@@ -1,0 +1,60 @@
+---
+title: "Issue Refunds"
+description: "You can issue refunds to your customers using the Dashboard or APIs. Refunds are possible for `captured` payments only."
+---
+
+<Info>
+**Customer Looking for Refund**
+</Info>
+
+If you are a customer looking for a refund, know about [customer refunds](/payments/customers/customer-refunds).
+
+## Full and Partial Refunds
+
+Refunds can be made either in **full** or in **part**.
+
+- **Full Refund**
+
+You can refund the entire amount that you received in the payment.
+
+- **Partial Refund**
+
+You can refund part of the amount received in the payment. You can issue multiple, partial refunds as long as their sum does not exceed the captured amount.
+
+A payment moves to the `refunded` state only when the entire amount is refunded to the customer. In case of partial refunds, the payment continues to remain in the `captured` state till the entire payment is refunded.
+
+## Issue Refunds
+
+### Issue Refunds Using Dashboard
+
+To issue refunds:
+
+<Steps>
+<Step title="Log in to the Dashboard.">
+Log in to the Dashboard.
+</Step>
+<Step title="Navigate to **Transactions** → **Payments**.">
+Navigate to **Transactions** → **Payments**.
+</Step>
+<Step title="Select the payment for which a refund is requested. The payment sho...">
+Select the payment for which a refund is requested. The payment should be in the `captured` state.
+</Step>
+<Step title="Scroll to the **Refund** section and click **Issue Refund**.">
+Scroll to the **Refund** section and click **Issue Refund**.
+</Step>
+<Step title="In the **amount** field, enter an amount lesser than the captured a...">
+In the **amount** field, enter an amount lesser than the captured amount for issuing a partial refund. By default, the entire amount will be refunded.
+</Step>
+</Steps>
+5. Review the fees that will be levied for the refund to be processed instantly. 
+6. Click the **Issue Full Refund** or **Issue Partial Refund** button, depending on the amount to be refunded.
+
+### Issue Refunds Using API
+
+- To create a normal refund, use the [Create a Normal Refund API](/api/refunds/create-normal).
+
+### Related Information
+
+- [About Refunds](/pos/refunds)
+- [Normal Refunds](/pos/refunds/normal)
+- [Refunds FAQs](/pos/refunds/faqs)

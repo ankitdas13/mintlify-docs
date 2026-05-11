@@ -1,0 +1,195 @@
+---
+title: "Razorpay quickstart: accept your first payment in minutes"
+description: "Create your Razorpay account, generate API keys, integrate Standard Checkout, and accept your first payment — from setup to go-live."
+---
+
+Razorpay lets you accept payments on your website or mobile app with a few lines of code. This guide walks you through creating an account, generating API keys, integrating Standard Checkout on the frontend, and verifying payments on your server.
+
+<Note>
+  Razorpay has two modes: **Test Mode** and **Live Mode**. Test Mode is available immediately after signup — no KYC required. API keys in Test Mode start with `rzp_test_` and process no real money. Live Mode requires KYC approval (typically 24–48 hours) and uses keys starting with `rzp_live_`.
+</Note>
+
+<Steps>
+  <Step title="Create an account and generate API keys">
+    [Sign up at the Razorpay Dashboard](https://dashboard.razorpay.com/signup). Once logged in, navigate to **Account & Settings → API Keys** and click **Generate Key**.
+
+    Razorpay generates a **Key ID** and a **Key Secret** together. Copy and store the Key Secret immediately — it is only shown once at the time of generation.
+
+    You can start building in Test Mode right away. To accept real payments, complete KYC from the Dashboard and wait for approval.
+  </Step>
+
+  <Step title="Create an order (server-side)">
+    Before showing the payment form to your customer, create an order on your server using the Razorpay SDK. The order ID ties the payment to your backend and is required for signature verification.
+
+    Install the Node.js SDK:
+
+    ```bash
+    npm install razorpay
+    ```
+
+    Then create an order:
+
+    <CodeGroup>
+
+    ```javascript Node.js
+    const Razorpay = require('razorpay');
+
+    const instance = new Razorpay({
+      key_id: 'rzp_test_YOUR_KEY_ID',
+      key_secret: 'YOUR_KEY_SECRET',
+    });
+
+    const order = await instance.orders.create({
+      amount: 50000, // Amount in paise (₹500)
+      currency: 'INR',
+      receipt: 'receipt_001',
+    });
+
+    // Pass order.id to your frontend
+    console.log(order.id); // e.g. order_IluGWxBm9U8zJ8
+    ```
+
+    ```python Python
+    import razorpay
+
+    client = razorpay.Client(auth=('rzp_test_YOUR_KEY_ID', 'YOUR_KEY_SECRET'))
+
+    order = client.order.create({
+        'amount': 50000,  # Amount in paise (₹500)
+        'currency': 'INR',
+        'receipt': 'receipt_001',
+    })
+
+    print(order['id'])  # e.g. order_IluGWxBm9U8zJ8
+    ```
+
+    ```php PHP
+    use Razorpay\Api\Api;
+
+    $api = new Api('rzp_test_YOUR_KEY_ID', 'YOUR_KEY_SECRET');
+
+    $order = $api->order->create([
+        'amount'   => 50000, // Amount in paise (₹500)
+        'currency' => 'INR',
+        'receipt'  => 'receipt_001',
+    ]);
+
+    echo $order['id']; // e.g. order_IluGWxBm9U8zJ8
+    ```
+
+    </CodeGroup>
+
+    Pass the `order.id` from your server to your frontend to use in the next step.
+  </Step>
+
+  <Step title="Integrate Standard Checkout (frontend)">
+    Add the Razorpay Checkout script to your HTML and open the payment form using the order ID you created in the previous step.
+
+    ```html
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+    var options = {
+      "key": "rzp_test_YOUR_KEY_ID",
+      "amount": "50000",                       // Amount in paise (₹500)
+      "currency": "INR",
+      "name": "Acme Corp",
+      "description": "Test Transaction",
+      "order_id": "order_IluGWxBm9U8zJ8",      // From your server
+      "handler": function (response) {
+        // Send these three values to your server for verification
+        console.log(response.razorpay_payment_id);
+        console.log(response.razorpay_order_id);
+        console.log(response.razorpay_signature);
+      },
+      "prefill": {
+        "name": "Jane Doe",
+        "email": "jane.doe@example.com",
+        "contact": "9000000000"
+      },
+      "theme": {
+        "color": "#1d4ed8"
+      }
+    };
+
+    var rzp1 = new Razorpay(options);
+    rzp1.open();
+    </script>
+    ```
+
+    The `handler` function runs after a successful payment. It receives a `razorpay_payment_id`, `razorpay_order_id`, and `razorpay_signature` — send all three to your server to verify the payment.
+  </Step>
+
+  <Step title="Verify payment signature (server-side)">
+    Always verify the payment signature on your server before fulfilling an order. This confirms the payment response was not tampered with.
+
+    <CodeGroup>
+
+    ```javascript Node.js
+    const crypto = require('crypto');
+
+    // razorpay_order_id, razorpay_payment_id, razorpay_signature
+    // are received from your frontend handler
+
+    const body = razorpay_order_id + '|' + razorpay_payment_id;
+
+    const expectedSignature = crypto
+      .createHmac('sha256', 'YOUR_KEY_SECRET')
+      .update(body.toString())
+      .digest('hex');
+
+    const isValid = expectedSignature === razorpay_signature;
+
+    if (isValid) {
+      // Payment is genuine — fulfill the order
+    } else {
+      // Signature mismatch — reject the payment
+    }
+    ```
+
+    ```python Python
+    import hmac
+    import hashlib
+
+    body = razorpay_order_id + '|' + razorpay_payment_id
+
+    expected_signature = hmac.new(
+        key=b'YOUR_KEY_SECRET',
+        msg=body.encode(),
+        digestmod=hashlib.sha256,
+    ).hexdigest()
+
+    is_valid = expected_signature == razorpay_signature
+    ```
+
+    ```php PHP
+    $body = $razorpay_order_id . '|' . $razorpay_payment_id;
+
+    $expected_signature = hash_hmac(
+        'sha256',
+        $body,
+        'YOUR_KEY_SECRET'
+    );
+
+    $is_valid = hash_equals($expected_signature, $razorpay_signature);
+    ```
+
+    </CodeGroup>
+
+    Only fulfill the order if `isValid` is `true`. Reject or flag any payment where signature verification fails.
+  </Step>
+
+  <Step title="Test and go live">
+    Use Razorpay's test card numbers to simulate payments in Test Mode before going live.
+
+    <Tip>
+      Use test card number `4111 1111 1111 1111` with any future expiry date and any 3-digit CVV to simulate a successful payment. Razorpay provides additional test cards for declined payments and UPI flows in the [Dashboard test credentials section](https://dashboard.razorpay.com/signup).
+    </Tip>
+
+    When you are ready to accept real payments:
+
+    1. Complete KYC from **Account & Settings** in the Dashboard. Approval typically takes 24–48 hours.
+    2. Generate a new set of **Live Mode** API keys (starting with `rzp_live_`).
+    3. Replace your `rzp_test_` Key ID and Key Secret with the live equivalents in both your server and frontend code.
+    4. Test a small real transaction to confirm end-to-end flow before announcing to customers.
+  </Step>
+</Steps>

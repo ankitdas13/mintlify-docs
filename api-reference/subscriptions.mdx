@@ -1,0 +1,117 @@
+---
+title: 'Subscriptions API — plans, billing cycles, and cancellation'
+description: 'Create billing plans and recurring subscriptions, fetch subscription details, and cancel subscriptions using the Razorpay Subscriptions API.'
+---
+
+The Subscriptions API handles recurring billing. You first create a **Plan** that defines the billing amount and frequency, then create a **Subscription** that links a customer to that plan. Razorpay automatically charges the customer on each billing cycle.
+
+---
+
+## Create a plan
+
+`POST /v1/plans`
+
+<ParamField body="period" type="string" required>
+  Billing frequency. One of `daily`, `weekly`, `monthly`, or `yearly`.
+</ParamField>
+
+<ParamField body="interval" type="integer" required>
+  Multiplier for the period. For example, `interval: 3` with `period: monthly` creates a quarterly billing cycle.
+</ParamField>
+
+<ParamField body="item" type="object" required>
+  Pricing details for this plan.
+
+  <Expandable title="properties">
+    <ParamField body="name" type="string" required>
+      Plan display name.
+    </ParamField>
+    <ParamField body="amount" type="integer" required>
+      Billing amount in the smallest currency unit.
+    </ParamField>
+    <ParamField body="currency" type="string" required>
+      ISO 4217 currency code.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+```bash
+curl -X POST https://api.razorpay.com/v1/plans \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET \
+  -H "Content-Type: application/json" \
+  -d '{
+    "period": "monthly",
+    "interval": 1,
+    "item": {
+      "name": "Pro Plan",
+      "amount": 4999,
+      "currency": "USD"
+    }
+  }'
+```
+
+---
+
+## Create a subscription
+
+`POST /v1/subscriptions`
+
+<ParamField body="plan_id" type="string" required>
+  The ID of the plan to subscribe the customer to.
+</ParamField>
+
+<ParamField body="total_count" type="integer" required>
+  Total number of billing cycles. For example, `12` for a one-year monthly subscription.
+</ParamField>
+
+<ParamField body="customer_notify" type="integer">
+  Set to `1` to send Razorpay's built-in email and SMS notifications to the customer. Set to `0` to manage notifications yourself.
+</ParamField>
+
+<ParamField body="start_at" type="integer">
+  Unix timestamp for when the first billing cycle should begin. Defaults to immediately.
+</ParamField>
+
+```bash
+curl -X POST https://api.razorpay.com/v1/subscriptions \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET \
+  -H "Content-Type: application/json" \
+  -d '{
+    "plan_id": "plan_00000000000001",
+    "total_count": 12,
+    "customer_notify": 1,
+    "start_at": 1735689600
+  }'
+```
+
+---
+
+## Fetch a subscription
+
+`GET /v1/subscriptions/:id`
+
+```bash
+curl -X GET https://api.razorpay.com/v1/subscriptions/sub_00000000000001 \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET
+```
+
+---
+
+## Cancel a subscription
+
+`POST /v1/subscriptions/:id/cancel`
+
+<ParamField body="cancel_at_cycle_end" type="integer">
+  Controls when the cancellation takes effect. Set to `0` to cancel immediately, or `1` to cancel at the end of the current billing cycle.
+</ParamField>
+
+```bash
+curl -X POST https://api.razorpay.com/v1/subscriptions/sub_00000000000001/cancel \
+  -u rzp_test_YOUR_KEY_ID:YOUR_KEY_SECRET \
+  -H "Content-Type: application/json" \
+  -d '{"cancel_at_cycle_end": 0}'
+```
+
+<Note>
+Cancelling immediately (`cancel_at_cycle_end: 0`) stops the subscription at once. The customer will not be charged for any remaining cycles. Cancelling at cycle end (`cancel_at_cycle_end: 1`) allows the current period to complete before stopping.
+</Note>

@@ -1,0 +1,53 @@
+---
+title: "UPI Number"
+description: "Razorpay's TPAP Pro - UPI Number APIs let you check availability, create, port, update, resolve, and fetch UPI Numbers for your customers."
+---
+
+Below are the steps to integrate TPAP Pro. You can also refer to our comprehensive [TPAP Pro integration guide](/payments/tpap-pro/integration-guide).
+
+<Steps>
+<Step title="[Customer Onboarding](/api/payments/tpap-pro/customer-onboarding)">
+[Customer Onboarding](/api/payments/tpap-pro/customer-onboarding)
+</Step>
+<Step title="[Manage Funds and Account](/api/payments/tpap-pro/funds-account-man...">
+[Manage Funds and Account](/api/payments/tpap-pro/funds-account-management)
+</Step>
+<Step title="[Payments](/api/payments/tpap-pro/payments-flow)">
+[Payments](/api/payments/tpap-pro/payments-flow)
+</Step>
+<Step title="[Manage Mandates](/api/payments/tpap-pro/mandate-flow)">
+[Manage Mandates](/api/payments/tpap-pro/mandate-flow)
+</Step>
+<Step title="[Manage Complaints](/api/payments/tpap-pro/complaints-flow)">
+[Manage Complaints](/api/payments/tpap-pro/complaints-flow)
+</Step>
+<Step title="Manage UPI Numbers">
+Manage UPI Numbers
+</Step>
+<Step title="[Manage Fundsource Lite](/api/payments/tpap-pro/fundsource-lite)">
+[Manage Fundsource Lite](/api/payments/tpap-pro/fundsource-lite)
+</Step>
+</Steps>
+ 
+
+### Related Guides
+
+[About TPAP Pro](/payments/tpap-pro)
+[Integrate With TPAP Pro](/payments/tpap-pro/integration-guide)
+
+### Endpoints
+
+- **post** `/v1/upi/tpap/upi_number/available` - Check UPI Number Availability: 
+Check if a UPI number is available to create or port.
+
+- **post** `/v1/upi/tpap/upi_number` - Create or Port UPI Number: 
+Create a new UPI number or port an existing one to your VPA.
+
+- **patch** `/v1/upi/tpap/upi_number` - Update UPI Number: 
+Update or deactivate a UPI number.
+
+- **get** `/v1/upi/tpap/upi_number` - Fetch UPI Numbers: 
+Fetch all UPI numbers linked to a customer.
+
+- **post** `/v1/upi/tpap/upi_number/resolve` - Resolve UPI Number: 
+Resolve UPI number to fetch linked VPA and merchant info.

@@ -1,0 +1,107 @@
+---
+title: 'Understanding Razorpay API error responses'
+sidebarTitle: 'Error structure'
+description: 'Understand how Razorpay structures API error responses, what each field means, and how to handle failures gracefully in your integration.'
+---
+
+When a Razorpay API call fails, the response body contains a structured `error` object that tells you exactly what went wrong, who is responsible, and at which stage the failure occurred. Understanding this structure lets you handle errors programmatically and surface helpful messages to your customers.
+
+## Error response structure
+
+All successful Razorpay API responses return HTTP `200`. Failed requests return a non-2xx HTTP status code alongside a JSON body with an `error` object.
+
+```json
+{
+  "error": {
+    "code": "BAD_REQUEST_ERROR",
+    "description": "Authentication failed due to incorrect otp",
+    "field": null,
+    "source": "customer",
+    "step": "payment_authentication",
+    "reason": "invalid_otp",
+    "metadata": {
+      "payment_id": "pay_EDNBKIP31Y4jl8",
+      "order_id": "order_DBJKIP31Y4jl8"
+    }
+  }
+}
+```
+
+## Error fields
+
+| Field | Type | Description |
+|---|---|---|
+| `code` | string | High-level error category (e.g., `BAD_REQUEST_ERROR`) |
+| `description` | string | Human-readable explanation of the error |
+| `field` | string \| null | The request parameter that caused the error, if applicable |
+| `source` | string | Where the failure originated: `customer`, `business`, `razorpay`, `bank`, `gateway`, or `network` |
+| `step` | string | The payment stage where failure occurred (e.g., `payment_initiation`, `payment_authentication`, `payment_authorization`) |
+| `reason` | string | Machine-readable reason code for programmatic handling |
+| `metadata` | object | Additional context including `payment_id` and `order_id` |
+
+## Error code types
+
+Razorpay uses three top-level error codes in the `code` field:
+
+| Code | Meaning |
+|---|---|
+| `BAD_REQUEST_ERROR` | Invalid input, missing required fields, or a request that violates business rules |
+| `GATEWAY_ERROR` | An error returned by the payment gateway or issuing bank |
+| `SERVER_ERROR` | An internal Razorpay error (rare; contact support if you see this repeatedly) |
+
+## How to handle errors
+
+<Steps>
+  <Step title="Identify who is responsible">
+    Check `error.source` to determine whether the failure originated with the customer, your business configuration, the bank, the gateway, or Razorpay itself. This tells you who needs to take action.
+  </Step>
+  <Step title="Branch on the reason code">
+    Use `error.reason` for programmatic handling — it is stable and machine-readable, unlike `description` which may change. For example, retry logic for `network_error` will differ from user communication for `invalid_otp`.
+  </Step>
+  <Step title="Show a helpful message to the customer">
+    Use `error.description` as a starting point for the message you display. Avoid exposing raw technical details; translate them into actionable guidance (e.g., "Your OTP was incorrect. Please try again.").
+  </Step>
+  <Step title="Trace the payment">
+    Use `metadata.payment_id` and `metadata.order_id` to look up the transaction in your database and in the Razorpay Dashboard for debugging.
+  </Step>
+</Steps>
+
+## Handling payment failures in checkout
+
+Razorpay Checkout fires a `payment.failed` event when a payment attempt fails on the client side. Subscribe to this event to capture error details and respond appropriately.
+
+```javascript
+var options = {
+  // ... other checkout options
+  "handler": function(response) {
+    // Payment succeeded — handle the success response
+  },
+  "modal": {
+    "ondismiss": function() {
+      // Customer closed the checkout modal without completing payment
+    }
+  }
+};
+
+var rzp = new Razorpay(options);
+
+rzp.on('payment.failed', function(response) {
+  console.error(response.error.code);
+  console.error(response.error.description);
+  console.error(response.error.source);
+  console.error(response.error.step);
+  console.error(response.error.reason);
+  console.error(response.error.metadata.order_id);
+  console.error(response.error.metadata.payment_id);
+});
+
+rzp.open();
+```
+
+<Note>
+  The `payment.failed` event only fires for payment attempts that were initiated. If the customer closes the modal before attempting payment, only `modal.ondismiss` is called.
+</Note>
+
+## Next steps
+
+See [Common errors & troubleshooting](/errors/common-errors) for solutions to the most frequently encountered issues.

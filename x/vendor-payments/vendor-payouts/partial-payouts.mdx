@@ -1,0 +1,83 @@
+---
+title: "Partial Payouts"
+description: "Using RazorpayX, you can make partial payouts on a given invoice. The Partial Payouts feature eliminates the need for mulitple invoices and allows you to make many smaller payments on the same invoice."
+---
+
+## How it Works
+ 
+Here is a typical business use case that explains how partial payments work:
+ 
+<Steps>
+<Step title="You receive either a **proforma invoice** (an invoice which is prov...">
+You receive either a **proforma invoice** (an invoice which is provided before delivery of the goods/services) or **payment terms** (details of advances, due date, delivery date, and so on) before accepting/confirming the order.
+</Step>
+<Step title="Create a vendor payment with or without uploading a proforma invoice.">
+Create a vendor payment with or without uploading a proforma invoice.
+</Step>
+<Step title="Pay an advance to the vendor based on payment terms.">
+Pay an advance to the vendor based on payment terms.
+</Step>
+<Step title="You receive a second invoice post-delivery of goods/services.">
+You receive a second invoice post-delivery of goods/services.
+</Step>
+<Step title="Replace/Upload the latest invoice after receiving it.">
+Replace/Upload the latest invoice after receiving it.
+</Step>
+<Step title="Make a partial payment because one of the goods was not delivered o...">
+Make a partial payment because one of the goods was not delivered or because of service quality issues.
+</Step>
+<Step title="The vendor rectifies/completes the pending transaction and sends an...">
+The vendor rectifies/completes the pending transaction and sends an updated invoice.
+</Step>
+<Step title="Pay the remaining amount to match the new invoice amount.">
+Pay the remaining amount to match the new invoice amount.
+</Step>
+</Steps>
+ 
+## Make Partial Payouts
+ 
+To make a partial payout:
+ 
+<Steps>
+<Step title="Log in to your [RazorpayX Dashboard](https://x.razorpay.com/).">
+Log in to your [RazorpayX Dashboard](https://x.razorpay.com/).
+</Step>
+<Step title="Navigate to **Menu** → **Vendor Payments**.">
+Navigate to **Menu** → **Vendor Payments**.
+</Step>
+<Step title="Select the invoice you want to pay partially. A pop-up screen appea...">
+Select the invoice you want to pay partially. A pop-up screen appears to the right side of the screen.
+</Step>
+<Step title="In this window, click or hover over the options arrow next to the *...">
+In this window, click or hover over the options arrow next to the **PAY/SCHEDULE** button for the drop-down menu to appear. Here, click **PAY PARTIALLY**.
+
+</Step>
+<Step title="You must now create a payout.">
+You must now create a payout.
+- In the **New Payout** window, enter the Contact's valid details and [create a Fund Account](/x/contacts#create-a-contact-with-fund-account) if the Contact doesn't have one. You can also select the [Contact type](/x/contacts#contact-types) to be `Vendor`.
+- Your contact, fund account and payout progress is automatically saved in RazorpayX. If you quit the **New Payout** window, or click **BACK**, you can always restart from the **Edit Invoice Screen**, as shown.
+
+</Step>
+<Step title="Finalise all the payout details and click **Next**.">
+Finalise all the payout details and click **Next**.
+
+</Step>
+</Steps>
+<Info>
+**Handy Tips**
+- If you click on **Pay in Full** instead of paying partially, the invoice gets updated to match the same. You can select **Pay Partially** once again to update the invoice.
+- Ensure to enter the correct amount when making partial payout. This amount should **always** be less than the actual payment to be made.
+</Info>
+
+7. Enter OTP and complete the payment.
+ 
+After you make a Partial Payout, the invoice status changes to `Partially Paid`.
+ 
+### Related Information
+
+- [Bulk Payouts](/x/vendor-payments/vendor-payouts/bulk)
+- [Scheduled Payouts](/x/vendor-payments/vendor-payouts/scheduled-payouts)
+- [Invoices](/x/vendor-payments/invoices)
+- [Invoice Life Cycle](/x/vendor-payments/life-cycle)
+- [Advances](/x/vendor-payments/advances)
+- [Purchase Orders](/x/vendor-payments/purchase-order)

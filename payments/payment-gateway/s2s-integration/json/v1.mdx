@@ -1,0 +1,57 @@
+---
+title: "About Server-to-Server JSON V1 Integration"
+description: "Our default [Server-to-Server integration](/payments/payment-gateway/s2s-integration/redirect) is simple."
+---
+
+- The payment creation request returns a variety of responses. All of these responses need to render on your customer's browser to push the payment forward. 
+
+- These responses result in redirecting the browser to a bank or gateway page to complete payment authentication.
+
+However, if you want more control over how the customer is redirected, you can use the JSON API endpoint. The response to this endpoint contains only the necessary details and information about the next steps to be taken. Your integration is required to handle different flows to be able to process a payment.
+
+<Info>
+
+**Feature Request**
+
+This is an on-demand feature. Please raise a request with our [Support team](https://razorpay.com/support/#request) to get this feature activated on your Razorpay account.
+
+</Info>
+## Prerequisites
+
+- Create a [Razorpay account](https://dashboard.razorpay.com/signup?).
+- Generate [API Keys](/api/authentication#generate-api-keys) from the Dashboard. To go live with the integration and start accepting real payments, generate Live Mode API Keys and replace them in the integration.
+- Know about the [Razorpay Payment Flow](/payments/payment-gateway/how-it-works).
+
+## Integration Steps
+
+Follow these integration steps:
+
+1. Build Integration: [Cards](/payments/payment-gateway/s2s-integration/json/v1/build-integration/cards), [UPI Collect](/payments/payment-gateway/s2s-integration/json/v1/build-integration/upi/collect) and  [UPI Intent](/payments/payment-gateway/s2s-integration/json/v1/build-integration/upi/intent).
+
+    
+<Info>
+
+**Handy Tips**
+
+For other payment methods, we recommend you to follow the build integration steps mentioned on the netbanking page, except step 1.2 - Create a Payment. Please use the relevant Create a Payment sample code for the payment method. 
+
+Payment Method | Create Payment Sample Code
+---
+EMI | [Sample Code](/payments/payment-gateway/s2s-integration/payment-methods#emi)
+---
+Cardless EMI | [Sample Code](/payments/payment-gateway/s2s-integration/payment-methods#cardless-emi)
+---
+Wallet | [Sample Code](/payments/payment-gateway/s2s-integration/payment-methods#wallet)
+---
+Pay Later | [Sample Code](/payments/payment-gateway/s2s-integration/payment-methods#pay-later)
+---
+CRED | [Sample Code](/payments/payment-gateway/s2s-integration/payment-methods#cred)
+
+2. [Test Integration](/payments/payment-gateway/s2s-integration/json/v1/test-integration)
+3. [Go-Live Checklist](/payments/payment-gateway/s2s-integration/json/v1/go-live-checklist)
+
+</Info>
+### Related Information
+
+- [Best Practices](/payments/payment-gateway/s2s-integration/best-practices)
+- [Address Verification System](/payments/payment-gateway/s2s-integration/features/address-verification-system)

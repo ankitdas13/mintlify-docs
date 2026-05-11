@@ -1,0 +1,113 @@
+---
+title: 'Ecommerce platform plugins for Payment Gateway'
+description: 'Accept Razorpay payments on WooCommerce, Shopify, Magento 2, PrestaShop, and OpenCart using official plugins — no custom code required.'
+---
+
+Razorpay provides official plugins for major ecommerce platforms. Installing a plugin connects your storefront to Razorpay's payment infrastructure without writing any custom code. You install the plugin, enter your API keys, and your customers can pay immediately.
+
+<Note>
+  All plugins support both Test and Live modes. Use your test API keys during setup and switch to live keys before going live.
+</Note>
+
+## Supported platforms
+
+<CardGroup cols={2}>
+  <Card title="WooCommerce" icon="wordpress">
+    WordPress stores using the WooCommerce plugin.
+  </Card>
+  <Card title="Shopify" icon="shopping-bag">
+    Shopify stores via the Shopify App Store.
+  </Card>
+  <Card title="Magento 2" icon="box">
+    Magento 2 stores via Composer or direct download.
+  </Card>
+  <Card title="PrestaShop" icon="store">
+    PrestaShop stores using the Razorpay module.
+  </Card>
+  <Card title="OpenCart" icon="shopping-cart">
+    OpenCart stores using the Razorpay extension.
+  </Card>
+</CardGroup>
+
+## WooCommerce
+
+Install the **Razorpay for WooCommerce** plugin directly from the WordPress plugin directory:
+
+<Steps>
+  <Step title="Install the plugin">
+    In your WordPress admin panel, go to **Plugins → Add New** and search for "Razorpay for WooCommerce". Install and activate the plugin.
+  </Step>
+  <Step title="Configure API keys">
+    Go to **WooCommerce → Settings → Payments** and click **Razorpay**. Enter your **Key ID** and **Key Secret** from the Razorpay Dashboard.
+  </Step>
+  <Step title="Choose Test or Live mode">
+    Enable **Test Mode** to use test keys during development. Disable it and enter your live keys when you are ready to accept real payments.
+  </Step>
+</Steps>
+
+## Shopify
+
+<Steps>
+  <Step title="Install from the Shopify App Store">
+    Search for "Razorpay" in the [Shopify App Store](https://apps.shopify.com) and install the official Razorpay app.
+  </Step>
+  <Step title="Configure API keys">
+    In your Shopify admin, go to **Settings → Payments** and locate the Razorpay payment provider. Enter your **Key ID** and **Key Secret**.
+  </Step>
+  <Step title="Activate the payment method">
+    Enable Razorpay as a payment option. The standard Razorpay checkout flow will appear to customers at checkout.
+  </Step>
+</Steps>
+
+## Magento 2
+
+<Steps>
+  <Step title="Install the extension">
+    Install via Composer (recommended) or download directly from the [Razorpay GitHub repository](https://github.com/razorpay/razorpay-magento).
+
+    ```bash terminal
+    composer require razorpay/magento2
+    php bin/magento setup:upgrade
+    php bin/magento setup:di:compile
+    php bin/magento cache:clean
+    ```
+  </Step>
+  <Step title="Configure API keys">
+    In the Magento admin, go to **Stores → Configuration → Sales → Payment Methods → Razorpay**. Enter your **Key ID** and **Key Secret**.
+  </Step>
+  <Step title="Set Test or Live mode">
+    Select the appropriate mode and save the configuration.
+  </Step>
+</Steps>
+
+## PrestaShop
+
+<Steps>
+  <Step title="Download and install the module">
+    Download the Razorpay module from the Razorpay website or your Razorpay Dashboard. In the PrestaShop admin, go to **Modules → Module Manager** and upload the module file.
+  </Step>
+  <Step title="Configure API keys">
+    After installation, go to the Razorpay module settings and enter your **Key ID** and **Key Secret**.
+  </Step>
+  <Step title="Set Test or Live mode">
+    Choose the mode, save settings, and test a payment before going live.
+  </Step>
+</Steps>
+
+## OpenCart
+
+<Steps>
+  <Step title="Download and install the extension">
+    Download the Razorpay extension from the Razorpay website or your Dashboard. In the OpenCart admin, go to **Extensions → Installer** and upload the extension package.
+  </Step>
+  <Step title="Configure API keys">
+    Navigate to **Extensions → Payments → Razorpay** and enter your **Key ID** and **Key Secret**.
+  </Step>
+  <Step title="Enable the payment method">
+    Set the status to **Enabled**, choose Test or Live mode, then save. Razorpay will appear as a payment option at checkout.
+  </Step>
+</Steps>
+
+<Tip>
+  You can find your **Key ID** and **Key Secret** in the Razorpay Dashboard under **Settings → API Keys**. Generate separate key pairs for Test and Live environments.
+</Tip>

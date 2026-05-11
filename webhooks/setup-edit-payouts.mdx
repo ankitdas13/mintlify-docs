@@ -1,0 +1,85 @@
+---
+title: "Set Up and Edit Payout Webhooks"
+description: "You can set up and edit webhooks from the RazorpayX Dashboard."
+---
+
+## Set Up and Edit Webhooks
+
+<Info>
+**Handy Tips**
+</Info>
+
+It is important to validate and test webhooks before you start using them. To test webhooks, refer [Validate and Test Webhooks](/webhooks/validate-test).
+
+To set up webhooks:
+
+1. Log in to the [RazorpayX Dashboard](https://x.razorpay.com), and navigate to **My Account & Settings** → **Developer Controls**.
+1. Click **Add Webhooks** if you are setting up a webhook or **Edit Webhook** to edit a previously saved webhook.
+1. Enter the **Webhook URL** where you want to receive the webhook payload when an event is triggered. 
+    
+<Info>
+**Handy Tips**
+</Info>
+
+- You can set up to **30 URLs** to receive Webhook notifications. Webhooks can only be delivered to public URLs.
+- This webhook URL can be different from your [Razorpay Payment Gateway webhook URL](/webhooks/setup-edit-payments).
+- If you attempt to save a localhost endpoint as part of a webhook setup, you will notice an error. Know more about [alternatives to localhost](/webhooks/validate-test#application-running-on-localhost).
+
+1. Enter a **Secret** for the webhook endpoint. This is an optional field and is used for [validation](/webhooks/validate-test).
+    
+<Info>
+**Secret for Webhooks**
+</Info>
+
+- When setting up the Webhooks, you will be asked to specify a secret. Using this secret, you can validate that the webhook is from Razorpay. 
+- Entering the secret is optional but recommended. The secret should never be exposed publicly.
+- The webhook secret does not need to be the merchant secret key provided by Razorpay.
+
+1. Select the events you want to subscribe from the list of **Active Events**.
+1. Click **SAVE** to enable the webhook.
+
+To edit webhooks:
+1. Log in to the [RazorpayX Dashboard](https://x.razorpay.com), and navigate to **My Account & Settings** → **Developer Controls**.
+2. After you have configured the webhooks, you can click **Edit** to make changes to a previously saved webhook.
+
+<Info>
+**Handy Tips**
+</Info>
+
+Enter the default OTP `754081` when prompted, while setting up, editing or deleting a webhook in test mode.
+
+## Enable/Disable a Webhook
+
+To enable or disable a webhook:
+<Steps>
+<Step title="Log in to the [RazorpayX Dashboard](https://x.razorpay.com) and nav...">
+Log in to the [RazorpayX Dashboard](https://x.razorpay.com) and navigate to **My Account & Settings** → **Developer Controls**.
+</Step>
+<Step title="Scroll down to the **WEBHOOKS** section.">
+Scroll down to the **WEBHOOKS** section.
+</Step>
+<Step title="Click **EDIT WEBHOOK**.">
+Click **EDIT WEBHOOK**.
+</Step>
+<Step title="Use the **Webhook Active?** option to enable or disable the webhook...">
+Use the **Webhook Active?** option to enable or disable the webhook as shown below:
+
+</Step>
+</Steps>
+
+## Deactivation
+
+All webhook responses must return a status code in the range `2XX` within a window of 5 seconds. If we receive response codes other than this or the request times out, it is considered a failure.
+
+On failure, a webhook is re-tried at progressive intervals of time, defined in the exponential back-off policy, for 24 hours. If the failures continue for 24 hours, the webhook is disabled. You have to enable the webhook from the [RazorpayX Dashboard](https://x.razorpay.com) after fixing the errors at your end. Know more about [enabling webhooks](/webhooks/setup-edit-payouts#enabledisable-a-webhook).
+
+<Info>
+**Handy Tips**
+</Info>
+
+When a webhook gets disabled, you receive an email notification on the email id you configured while setting up the webhooks.
+
+### Related Information
+- [Webhooks](/webhooks)
+- [Set Up and Edit Payments Webhooks](/webhooks/setup-edit-payments)
+- [Validate and Test Webhooks](/webhooks/validate-test)

@@ -1,0 +1,44 @@
+---
+title: "How Smart Collect Works"
+description: "The following steps explain how Smart Collect uses Customer Identifiers to receive payments from the customers:"
+---
+
+<Steps>
+<Step title="Step 1">
+Set up your [Razorpay account](/payments/set-up).
+</Step>
+<Step title="Step 2">
+Create Customer Identifiers tagged to the customer.
+</Step>
+<Step title="Step 3">
+The account details of the Customer Identifier created by Razorpay (such as account number, IFSC and Name) should be shared with the customer.
+</Step>
+<Step title="Step 4">
+The customer adds the bank account as a beneficiary on their preferred netbanking portal and transfers the money using NEFT, RTGS or IMPS.
+</Step>
+<Step title="Step 5">
+Payment deposited in these customer identifiers is settled into your bank account linked with Razorpay.
+</Step>
+</Steps>
+
+<Info>
+
+**Payment Confirmation**
+
+You can consider a payment to be successful only when you receive the notification from Razorpay. You can [check the payment status on the Dashboard](/payments/smart-collect/create#view-payments). Also, you can choose to configure [webhooks](/payments/smart-collect/subscribe-to-webhooks) and subscribe to the `virtual_account.credited` event to receive notifications when customers make payments.
+
+</Info>
+## Customer Identifier Format
+
+You can create a unique Customer Identifier using Smart Collect to receive payments from your customers. The Customer Identifier consists of 16 digits. 
+
+```
+Bank Account Number: 1112220040042526
+```
+Know more about [Customer Identifier States](/payments/smart-collect/states).
+
+### Related Information
+- [Smart Collect](/payments/smart-collect)
+- [Auto Third Party Validation (TPV) on Smart Collect](/payments/smart-collect/third-party-validation)
+- [Smart Collect APIs](/api/payments/smart-collect)
+- [Subscribe to Webhooks](/payments/smart-collect/subscribe-to-webhooks)

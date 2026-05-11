@@ -1,0 +1,103 @@
+---
+title: "Sub-Merchant Onboarding APIs Flow"
+description: "To use the Sub-Merchant Onboarding APIs, you need to enroll in the Razorpay Partner Program."
+---
+
+The following illustration depicts the Sub-merchant Onboarding APIs flow to help Partners onboard merchants from their platform:
+
+Follow the steps given below:
+
+<Steps>
+<Step title="Sign in to your Partner Dashboard to obtain your `client_id` and `c...">
+Sign in to your Partner Dashboard to obtain your `client_id` and `client_secret` to authenticate API calls. You can obtain `client_id` and `client_secret` depending on the test mode or live mode.
+</Step>
+<Step title="Create a webhook related to desired events such as payments, orders...">
+Create a webhook related to desired events such as payments, orders, invoices and so on.
+</Step>
+<Step title="Create an account for the sub-merchant using the [Create an Account...">
+Create an account for the sub-merchant using the [Create an Account API](/api/partners/account-onboarding/create).
+</Step>
+<Step title="An account is created and the `account_id` is provided in the respo...">
+An account is created and the `account_id` is provided in the response. For example, `acc_Hbu4sC0O4GOGSN`. Use this `account_id` to fetch, update, delete the account and upload account documents.
+</Step>
+<Step title="Use the [Create a Stakeholder API](/api/partners/stakeholder/create...">
+Use the [Create a Stakeholder API](/api/partners/stakeholder/create) to add a stakeholder for an account. Each stakeholder needs to update the KYC.
+</Step>
+<Step title="A `stakeholder_id` is provided in the response as a stakeholder is...">
+A `stakeholder_id` is provided in the response as a stakeholder is created. For example, `sth_Hbu4sC0O4GOGSK`. Use this stakeholder id to complete stakeholder-related KYC details while onboarding a product. Also, use this `stakeholder_id` to fetch and update a stakeholder.
+</Step>
+<Step title="Before activating the sub-merchant and requesting for relevant prod...">
+Before activating the sub-merchant and requesting for relevant product configurations, the sub-merchant needs to view and accept Terms and Conditions. The partner can fetch Terms and Conditions links to show to the sub-merchant using [Fetch Terms and Conditions API](/api/partners/terms-conditions/fetch).
+</Step>
+<Step title="As requested, the partner will get a link to the relevant Terms and...">
+As requested, the partner will get a link to the relevant Terms and Conditions.
+</Step>
+<Step title="Create a product (for example, `payment_gateway`) and accept Terms...">
+Create a product (for example, `payment_gateway`) and accept Terms and Conditions for the sub-merchant using the [Request a Product Configuration API](/api/partners/product-configuration/request). A product is created with default configurations. To update configurations, you can use the [Update a Product Configuration API](/api/partners/product-configuration/update-settlement-account-details) (For Payment gateway product, settlement details (bank account) have to be sent in the Update Config API).
+</Step>
+<Step title="As the product is created, the `merchant_product_id` and the list o...">
+As the product is created, the `merchant_product_id` and the list of pending requirements are provided in the response.
+</Step>
+<Step title="Cater to the pending account requirements using the [Update an Acco...">
+Cater to the pending account requirements using the [Update an Account API](/api/partners/account-onboarding/update).
+</Step>
+<Step title="As the requested account details criteria is met, an updated accoun...">
+As the requested account details criteria is met, an updated account response will be provided.
+</Step>
+<Step title="Using the [Documents APIs](/api/partners/upload-document), upload t...">
+Using the [Documents APIs](/api/partners/upload-document), upload the required sub-merchant's business documents.
+</Step>
+<Step title="Once the required documents are uploaded, the uploaded details of a...">
+Once the required documents are uploaded, the uploaded details of a document (S3 URL) are provided in the response based on the entity, that is, account.
+</Step>
+<Step title="Fill in the stakeholder requirements using the [Update a Stakeholde...">
+Fill in the stakeholder requirements using the [Update a Stakeholder API](/api/partners/stakeholder/update). For example, KYC requirements such as PAN is the type of document required to establish the stakeholder's identity.
+</Step>
+<Step title="After the KYC requirements for a stakeholder are met, the response...">
+After the KYC requirements for a stakeholder are met, the response for the stakeholder is updated.
+</Step>
+<Step title="Using the [Documents APIs](/api/partners/upload-document), upload t...">
+Using the [Documents APIs](/api/partners/upload-document), upload the required sub-merchant's stakeholder's signatory documents.
+</Step>
+<Step title="Once the required documents are uploaded, the uploaded document det...">
+Once the required documents are uploaded, the uploaded document details (S3 URL) are provided in the response based on the entity, that is, stakeholder.
+</Step>
+<Step title="Using the [Product Configuration Request APIs](/api/partners/produc...">
+Using the [Product Configuration Request APIs](/api/partners/product-configuration/fetch), fetch the account product.
+</Step>
+<Step title="The [product activation status](/partners/aggregators/onboarding-ap...">
+The [product activation status](/partners/aggregators/onboarding-api/product-activation) changes to `under_review` when all the requirements are met. At this point, the status for a Payment Gateway product changes to `under_review` and the webhook event `product.payment_gateway.under_review` is triggered.
+</Step>
+<Step title="When the [product status](/partners/aggregators/onboarding-api/prod...">
+When the [product status](/partners/aggregators/onboarding-api/product-activation#product-activation-states) is changed to `needs_clarification`, the webhook event `product.payment_gateway.needs_clarification` is triggered.
+
+</Step>
+</Steps>
+<Info>
+**Handy Tips**
+</Info>
+
+Repeat steps 11 to 18 till the account status changes to **Terminal state** (either activated or rejected).
+
+22. The webhook event `product.payment_gateway.activated` is triggered when the Payment Gateway product status is `activated`.
+
+<Warning>
+
+**Watch Out!**
+
+Currently, we do not support making concurrent requests to the following Onboarding APIs including their combination on the same `account_id`:
+- [Update Account API](/api/partners/account-onboarding/update)
+- [Update Product Configuration API](/api/partners/product-configuration/update-settlement-account-details)
+- [Update Stakeholder API](/api/partners/stakeholder/update)
+
+Please wait for the response of these APIs before making subsequent requests.
+
+</Warning>
+### Related Information
+
+- [Product Activation Status](/partners/aggregators/onboarding-api/product-activation)
+- [Sub-Merchant Onboarding APIs](/partners/aggregators/onboarding-api)
+- [Partners Account APIs](/api/partners/account-onboarding)
+- [Product Configuration APIs](/api/partners/product-configuration)
+- [Stakeholder APIs](/api/partners/stakeholder)
+- [Partners API Errors](/api/partners/errors)

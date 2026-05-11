@@ -1,0 +1,337 @@
+---
+title: 'Fix common Razorpay integration errors and issues'
+description: 'Step-by-step fixes for the most frequent Razorpay integration errors, from signature mismatches and invalid keys to checkout and webhook issues.'
+---
+
+Most integration problems fall into a small set of categories: credential mismatches, incorrect request construction, order state issues, and client-side checkout behavior. The sections below cover each common error, explain why it occurs, and walk you through the fix.
+
+<AccordionGroup>
+  <Accordion title='"Signature verification failed"' icon="shield-x">
+    **Cause**
+
+    Razorpay requires you to verify every payment on your server by computing an HMAC-SHA256 signature and comparing it to the value Razorpay returns. This error occurs when the computed signature does not match — most often because the input string is wrong or the secret key has been encoded or trimmed.
+
+    **How to fix**
+
+    <Steps>
+      <Step title="Use the correct concatenation format">
+        The input string must be exactly `razorpay_order_id + "|" + razorpay_payment_id`. Do not add spaces, newlines, or any other characters.
+      </Step>
+      <Step title="Use the raw Key Secret">
+        Copy your Key Secret directly from the Razorpay Dashboard. Do not Base64-encode it, URL-encode it, or trim it.
+      </Step>
+      <Step title="Use HMAC-SHA256">
+        The signature algorithm must be HMAC-SHA256. The output must be a hex digest (not Base64).
+      </Step>
+    </Steps>
+
+    **Example: Node.js**
+
+    ```javascript
+    const crypto = require('crypto');
+
+    const body = razorpay_order_id + '|' + razorpay_payment_id;
+
+    const expectedSignature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(body)
+      .digest('hex');
+
+    if (expectedSignature === razorpay_signature) {
+      // Payment is legitimate — fulfil the order
+    } else {
+      // Signature mismatch — do not fulfil
+      throw new Error('Signature verification failed');
+    }
+    ```
+
+    <Warning>
+      Never trust a payment without server-side signature verification. Client-side confirmation alone can be spoofed.
+    </Warning>
+  </Accordion>
+
+  <Accordion title='"Key ID is invalid" / "Authentication failed"' icon="key">
+    **Cause**
+
+    These errors appear when you use the wrong API key. Common causes:
+
+    - Pasting the Key Secret where the Key ID is expected (or vice versa)
+    - Using Test mode keys (`rzp_test_`) against the Live API, or Live keys (`rzp_live_`) in a Test environment
+    - Accidentally including extra whitespace when copying the key
+
+    **How to fix**
+
+    <Steps>
+      <Step title="Confirm the key prefix">
+        Test keys start with `rzp_test_`. Live keys start with `rzp_live_`. Make sure the key you are using matches your current environment.
+      </Step>
+      <Step title="Regenerate keys if necessary">
+        Go to **Razorpay Dashboard → Settings → API Keys** to view or regenerate your keys. Never share or commit your Key Secret to source control.
+      </Step>
+      <Step title="Check your environment variables">
+        Verify that your server is loading the correct environment variable at runtime. A common mistake is having a `.env` file with Test keys while the production environment supplies different values.
+      </Step>
+    </Steps>
+
+    <Tip>
+      Store your Key ID and Key Secret in environment variables and reference them by name in code. This prevents accidental key swaps across environments.
+    </Tip>
+  </Accordion>
+
+  <Accordion title='"Order already paid" (HTTP 400)' icon="circle-check">
+    **Cause**
+
+    A Razorpay order moves to a `paid` state after a successful payment. Attempting to initiate another payment against the same order ID returns this error.
+
+    **How to fix**
+
+    <Steps>
+      <Step title="Check order status before opening checkout">
+        Query the order status from your server before presenting the payment UI. If the order is already `paid`, skip the checkout and show the customer a confirmation instead.
+      </Step>
+      <Step title="Listen for the order.paid webhook">
+        Use the `order.paid` webhook event to update your database as soon as a payment succeeds. This keeps your order state in sync even if the customer's browser closes before the redirect.
+
+        ```javascript
+        // Webhook handler (Express)
+        app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+          const event = JSON.parse(req.body);
+          if (event.event === 'order.paid') {
+            const orderId = event.payload.order.entity.id;
+            // Mark order as paid in your database
+          }
+          res.status(200).json({ received: true });
+        });
+        ```
+      </Step>
+      <Step title="Create a fresh order for each attempt">
+        If you need to retry a failed payment, create a new Razorpay order rather than reusing an existing order ID.
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title='"Amount too small" or "Amount too large"' icon="indian-rupee">
+    **Cause**
+
+    Razorpay expects amounts in the **smallest currency unit** (paise for INR, cents for USD). Passing a decimal value (e.g., `10.00`) or an amount that exceeds your account's transaction limit will be rejected.
+
+    **How to fix**
+
+    <Steps>
+      <Step title="Convert to the smallest unit">
+        Multiply your amount by 100 before passing it to the API.
+
+        ```javascript
+        // Correct: ₹10.00 → 1000 paise
+        const amountInPaise = Math.round(parseFloat(orderTotal) * 100);
+
+        const order = await razorpay.orders.create({
+          amount: amountInPaise,
+          currency: 'INR',
+          receipt: 'order_receipt_1',
+        });
+        ```
+      </Step>
+      <Step title="Check your transaction limits">
+        Go to **Razorpay Dashboard → Settings → Business Settings** to review per-transaction and daily limits. Contact Razorpay support if you need higher limits for your business.
+      </Step>
+    </Steps>
+
+    <Note>
+      The minimum transaction amount for INR is ₹1 (100 paise). Amounts below this will be rejected.
+    </Note>
+  </Accordion>
+
+  <Accordion title="Payment failed at checkout (customer side)" icon="credit-card">
+    **Cause**
+
+    Customer-side payment failures are not integration bugs — they occur due to factors outside your control:
+
+    - Incorrect OTP entered
+    - Card declined by the issuing bank
+    - Insufficient funds
+    - Bank or network downtime
+    - 3D Secure authentication failure
+
+    **How to fix**
+
+    <Steps>
+      <Step title="Handle the payment.failed event">
+        Listen for the `payment.failed` event in Razorpay Checkout and surface a clear, actionable message to the customer. Avoid exposing raw error codes.
+
+        ```javascript
+        rzp.on('payment.failed', function(response) {
+          const reason = response.error.reason;
+
+          if (reason === 'invalid_otp') {
+            showMessage('The OTP you entered is incorrect. Please try again.');
+          } else if (reason === 'insufficient_funds') {
+            showMessage('Your card has insufficient funds. Try a different payment method.');
+          } else {
+            showMessage('Payment could not be completed. Please try a different method.');
+          }
+        });
+        ```
+      </Step>
+      <Step title="Offer alternative payment methods">
+        Encourage the customer to try a different card, UPI, net banking, or wallet. Razorpay Checkout shows available methods automatically based on your configuration.
+      </Step>
+      <Step title="Check Razorpay system status">
+        If you are seeing a high volume of failures that are not customer-related, visit the [Razorpay Status Page](https://status.razorpay.com) to check for ongoing incidents.
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title='"Webhook signature mismatch"' icon="webhook">
+    **Cause**
+
+    Razorpay signs webhook payloads using your Webhook Secret. The signature is computed over the **raw request body bytes**. If your server parses the body as JSON before verification (which reformats the bytes), the computed signature will not match.
+
+    **How to fix**
+
+    <Steps>
+      <Step title="Read the raw request body">
+        Configure your framework to expose the raw body for the webhook route. In Express, use `express.raw` instead of `express.json`.
+
+        ```javascript
+        const express = require('express');
+        const crypto = require('crypto');
+        const app = express();
+
+        // Use raw body for the webhook route only
+        app.post(
+          '/webhook',
+          express.raw({ type: 'application/json' }),
+          (req, res) => {
+            const rawBody = req.body; // Buffer, not a parsed object
+            const receivedSignature = req.headers['x-razorpay-signature'];
+
+            const expectedSignature = crypto
+              .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET)
+              .update(rawBody)
+              .digest('hex');
+
+            if (expectedSignature !== receivedSignature) {
+              return res.status(400).send('Invalid signature');
+            }
+
+            const event = JSON.parse(rawBody);
+            // Process the verified event
+            res.status(200).json({ received: true });
+          }
+        );
+        ```
+      </Step>
+      <Step title="Verify the correct secret">
+        Webhook signatures use the **Webhook Secret**, not your API Key Secret. These are different credentials. Find your Webhook Secret in **Dashboard → Settings → Webhooks**.
+      </Step>
+    </Steps>
+
+    <Warning>
+      Do not apply `express.json()` globally if you need raw body access on your webhook route. Apply body-parsing middleware per-route or exclude the webhook path from global middleware.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Checkout not opening on mobile" icon="smartphone">
+    **Cause**
+
+    Mobile browsers block popups and new window openings that are not triggered directly by a user gesture. If you call `rzp.open()` inside a `setTimeout`, after an async operation, or in any context that is not a direct response to a tap or click event, the browser may block the checkout from appearing.
+
+    **How to fix**
+
+    <Steps>
+      <Step title="Call rzp.open() directly inside the event handler">
+        Ensure `rzp.open()` is called synchronously within a click or tap event listener.
+
+        ```javascript
+        // Correct: called directly in click handler
+        document.getElementById('pay-button').addEventListener('click', function() {
+          var rzp = new Razorpay(options);
+          rzp.open();
+        });
+        ```
+
+        ```javascript
+        // Incorrect: called after an async delay
+        document.getElementById('pay-button').addEventListener('click', async function() {
+          const order = await createOrder(); // async break loses user gesture context
+          options.order_id = order.id;
+          var rzp = new Razorpay(options);
+          rzp.open(); // may be blocked on mobile
+        });
+        ```
+      </Step>
+      <Step title="Pre-create the order before the user clicks">
+        Create the Razorpay order when the page loads or when the user adds items to their cart — not inside the click handler. This allows you to call `rzp.open()` immediately on click without any async delay.
+
+        ```javascript
+        // Pre-create order when page loads
+        let orderId;
+        window.onload = async function() {
+          const order = await createOrder();
+          orderId = order.id;
+        };
+
+        document.getElementById('pay-button').addEventListener('click', function() {
+          var rzp = new Razorpay({ ...options, order_id: orderId });
+          rzp.open(); // called synchronously — works on mobile
+        });
+        ```
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title='"Invalid order_id"' icon="circle-alert">
+    **Cause**
+
+    This error occurs when the `order_id` passed to Razorpay Checkout does not exist, belongs to a different account, or was created in a different mode (Test vs Live).
+
+    **How to fix**
+
+    <Steps>
+      <Step title="Create a fresh order for every payment attempt">
+        Never cache or reuse order IDs across sessions or payment attempts. Generate a new order via the API each time a customer reaches your checkout.
+
+        ```javascript
+        // Server: create order just before rendering checkout
+        app.post('/create-order', async (req, res) => {
+          const order = await razorpay.orders.create({
+            amount: req.body.amount,
+            currency: 'INR',
+            receipt: `receipt_${Date.now()}`,
+          });
+          res.json({ order_id: order.id });
+        });
+        ```
+      </Step>
+      <Step title="Match the key and order environments">
+        An order created with Test API keys will not work with Live keys, and vice versa. Ensure your server creates the order using the same credentials that you pass to Razorpay Checkout.
+      </Step>
+      <Step title="Pass the order ID correctly">
+        Confirm that the `order_id` value in your checkout options exactly matches the `id` field returned by the Orders API — including the `order_` prefix.
+
+        ```javascript
+        var options = {
+          key: process.env.RAZORPAY_KEY_ID,
+          amount: order.amount,
+          currency: order.currency,
+          order_id: order.id, // e.g., "order_DBJKIP31Y4jl8"
+          // ...
+        };
+        ```
+      </Step>
+    </Steps>
+  </Accordion>
+</AccordionGroup>
+
+## Still need help?
+
+If you have worked through the relevant section above and are still experiencing issues, the following resources can help.
+
+- **Razorpay Support** — Raise a ticket or chat with the team at [razorpay.com/us/support](https://razorpay.com/us/support). Include the `payment_id` or `order_id` from the error metadata so the support team can trace the transaction.
+- **API Reference** — Check the API reference for the specific endpoint you are calling to confirm request parameters, required fields, and expected response shapes.
+- **Razorpay Status Page** — Visit [status.razorpay.com](https://status.razorpay.com) to check for active incidents if you are seeing widespread failures.
+
+<Tip>
+  When contacting support, always include the `payment_id`, `order_id`, and the full error response body. This significantly reduces the time to resolution.
+</Tip>
