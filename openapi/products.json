@@ -2000,6 +2000,147 @@
         }
       }
     },
+    "/invoices": {
+      "post": {
+        "tags": ["Invoices"],
+        "summary": "Create an invoice",
+        "description": "Creates a new invoice to bill a customer for products or services.",
+        "operationId": "createInvoice",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["type", "customer", "line_items"],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "description": "Type of invoice. Use `invoice` for regular invoices.",
+                    "enum": ["invoice", "link"],
+                    "example": "invoice"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Description of the invoice.",
+                    "example": "Invoice for Q1 services"
+                  },
+                  "customer": {
+                    "type": "object",
+                    "description": "Customer details for the invoice.",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "example": "Gaurav Kumar"
+                      },
+                      "email": {
+                        "type": "string",
+                        "example": "gaurav.kumar@example.com"
+                      },
+                      "contact": {
+                        "type": "string",
+                        "example": "+919876543210"
+                      }
+                    }
+                  },
+                  "line_items": {
+                    "type": "array",
+                    "description": "List of items in the invoice.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Name of the item.",
+                          "example": "Consulting Services"
+                        },
+                        "amount": {
+                          "type": "integer",
+                          "description": "Amount in smallest currency unit (paise).",
+                          "example": 100000
+                        },
+                        "quantity": {
+                          "type": "integer",
+                          "description": "Quantity of the item.",
+                          "example": 1
+                        }
+                      }
+                    }
+                  },
+                  "currency": {
+                    "type": "string",
+                    "description": "Currency code (ISO 4217).",
+                    "default": "INR",
+                    "example": "INR"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Invoice created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "inv_FgR9UMzgmKDJRi"
+                    },
+                    "entity": {
+                      "type": "string",
+                      "example": "invoice"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "issued"
+                    },
+                    "short_url": {
+                      "type": "string",
+                      "example": "https://rzp.io/i/w2CEwYmkAu"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Invoices"],
+        "summary": "List all invoices",
+        "description": "Returns a list of all invoices created.",
+        "operationId": "listInvoices",
+        "parameters": [
+          {
+            "name": "count",
+            "in": "query",
+            "description": "Number of invoices to return.",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "description": "Number of invoices to skip for pagination.",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of invoices retrieved successfully."
+          }
+        }
+      }
+    },
     "/payments/qr_codes/{id}/payments": {
       "get": {
         "tags": ["QR Codes"],
@@ -2090,6 +2231,10 @@
     {
       "name": "QR Codes",
       "description": "Create and manage QR codes for accepting UPI payments in-store or online."
+    },
+    {
+      "name": "Invoices",
+      "description": "Create and manage invoices to bill customers for products and services."
     }
   ]
 }
