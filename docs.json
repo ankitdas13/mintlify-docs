@@ -19,7 +19,9 @@
     },
     "links": []
   },
-  "options": ["copy", "view", "chatgpt", "claude"],
+  "contextual": {
+    "options": ["copy", "view", "chatgpt", "claude"]
+  },
   "feedback": {
     "thumbsRating": true,
     "suggestEdit": true,
