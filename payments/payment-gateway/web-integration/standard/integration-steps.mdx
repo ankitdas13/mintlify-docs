@@ -9,10 +9,10 @@ Follow these steps to integrate the Standard Checkout form on your website:
 **Before You Begin**
 
 Ensure your account is ready for integration:
-- Your Razorpay account is [activated](/payments/dashboard/account-settings/activation) (required for Live mode).
+- Your Razorpay account is [activated](/payments/dashboard/account-settings/activation-details) (required for Live mode).
 - You have generated [API keys](/payments/dashboard/account-settings/api-keys) for the correct mode (Test or Live).
 - Test mode API keys start with `rzp_test_` and Live mode keys start with `rzp_live_`.
-- Your website domain is [whitelisted](/payments/dashboard/account-settings/websites-apps) in the Dashboard.
+- Your website domain is [whitelisted](/payments/dashboard/account-settings/business-website-details) in the Dashboard.
 </Warning>
 
 <CardGroup cols={3}>
@@ -439,7 +439,7 @@ Follow the steps given below:
       </ParamField>
 
       <ParamField body="subscription_id" type="string">
-        If you are accepting recurring payments using Razorpay Checkout, you should pass the relevant `subscription_id` to the Checkout. Know more about [Subscriptions on Checkout](/api/subscriptions).
+        If you are accepting recurring payments using Razorpay Checkout, you should pass the relevant `subscription_id` to the Checkout. Know more about [Subscriptions on Checkout](/api/payments/subscriptions).
       </ParamField>
 
       <ParamField body="subscription_card_change" type="boolean">
@@ -535,7 +535,7 @@ Follow the steps given below:
       |-------|-------|----------|
       | The id provided does not exist. | Occurs when there is a mismatch between the API keys used while creating the `order_id`/`customer_id` and the API key passed in the checkout. | Make sure that the API keys passed in the checkout are the same as the API keys used while creating the `order_id`/`customer_id`. For example, if the order was created using Test mode keys, use Test mode keys in the checkout. |
       | Blocked by CORS policy. | Occurs when the server-to-server request is hit from the front end instead. | Make sure that the API calls are made from the server side and not the client side. The Orders API must be called from your backend server. |
-      | Payment blocked as website does not match registered website(s). | The domain from which checkout is loaded is not whitelisted. | Add your website URL to the [whitelisted domains](/payments/dashboard/account-settings/websites-apps) in Dashboard → Account & Settings → Website and app settings. |
+      | Payment blocked as website does not match registered website(s). | The domain from which checkout is loaded is not whitelisted. | Add your website URL to the [whitelisted domains](/payments/dashboard/account-settings/business-website-details) in Dashboard → Account & Settings → Website and app settings. |
       | Access Denied (from gateway). | API keys are incorrect or your account has restrictions. | Verify you are using the correct API keys for the mode (Test/Live). Regenerate keys if needed. Check if your account is activated for Live mode. |
       | Payment was not completed on time. | Customer did not complete payment within the timeout period (3-15 minutes). | This is expected behavior. The customer can retry the payment. |
 
