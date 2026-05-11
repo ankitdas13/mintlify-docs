@@ -15,8 +15,55 @@ Fork the Razorpay Postman Public Workspace and try the Orders APIs using your [T
 
 ### Endpoints
 
-  - **post** `/v1/orders` - Create an Order: 
+  - **post** `/v1/orders` - Create an Order:
     Creates an order by providing basic details such as amount and currency.
+
+<CodeGroup>
+```javascript Node
+var instance = new Razorpay({ key_id: 'YOUR_KEY_ID', key_secret: 'YOUR_SECRET' })
+
+instance.orders.create({
+  amount: 50000,
+  currency: "<currency>",
+  receipt: "receipt#1",
+  notes: {
+    key1: "value3",
+    key2: "value2"
+  }
+})
+```
+
+```python Python
+import razorpay
+
+client = razorpay.Client(auth=("YOUR_KEY_ID", "YOUR_SECRET"))
+
+client.order.create({
+  "amount": 50000,
+  "currency": "<currency>",
+  "receipt": "receipt#1",
+  "notes": {
+    "key1": "value3",
+    "key2": "value2"
+  }
+})
+```
+
+```bash cURL
+curl -u YOUR_KEY_ID:YOUR_SECRET \
+  -X POST https://api.razorpay.com/v1/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 50000,
+    "currency": "<currency>",
+    "receipt": "receipt#1",
+    "notes": {
+      "key1": "value3",
+      "key2": "value2"
+    }
+  }'
+```
+</CodeGroup>
   
 
   - **get** `/v1/orders` - Fetch All Orders: 
@@ -39,5 +86,7 @@ Fork the Razorpay Postman Public Workspace and try the Orders APIs using your [T
     Retrieves all the payments made for an order.
   
 
-  - **patch** `/v1/orders/:id` - Update an Order: 
+  - **patch** `/v1/orders/:id` - Update an Order:
     Modifies an existing order.
+
+[Test External Link](https://www.mintlify.com/docs/test)
