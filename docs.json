@@ -19,6 +19,12 @@
     },
     "links": []
   },
+  "options": ["copy", "view", "chatgpt", "claude"],
+  "feedback": {
+    "thumbsRating": true,
+    "suggestEdit": true,
+    "raiseIssue": true
+  },
   "api": {
     "playground": {
       "display": "interactive"
